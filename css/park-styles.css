@@ -1,0 +1,224 @@
+/* --- Styles partagés pour les pages de temps d'attente (disneyland_park.html & disneyland_studios.html) --- */
+
+:root {
+    --color-primary: #00287a; /* Bleu foncé de DLP */
+    --color-secondary: #ffc72c; /* Doré/Jaune (couleur d'accentuation) */
+    --color-text-light: #f4f4f4; /* Texte clair (utilisé pour le clignotement intermédiaire) */
+    --color-text-dark: #333; /* Texte foncé */
+    --color-bg-dark: #12122b; /* Fond bleu nuit */
+    --color-green: #28a745; /* Vert pour temps courts */
+    --color-red: #dc3545; /* Rouge pour fermé/temps longs */
+    --attraction-card-bg: #1f1f3e; /* Bleu légèrement plus clair pour le contraste */
+}
+
+/* Base et Typographie */
+body {
+    font-family: 'Poppins', sans-serif; 
+    background-color: var(--color-bg-dark); 
+    color: var(--color-text-light);
+    margin: 0;
+    padding: 0;
+}
+
+/* --- Header & Navigation --- */
+.park-header {
+    background-color: var(--color-primary);
+    padding: 15px 15px;
+    border-bottom: 3px solid var(--color-secondary);
+    text-align: center;
+    position: relative;
+    
+    /* ⭐ MODIFICATION CLÉ : Le Header reste en haut lors du défilement ⭐ */
+    position: sticky; 
+    top: 0; /* Reste collé au sommet */
+    z-index: 1000; /* Assure qu'il est au-dessus du reste du contenu */
+}
+
+.park-header h1 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 2em;
+    color: var(--color-secondary);
+    margin: 0;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+    font-weight: 700;
+}
+
+.back-link {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%); 
+    font-size: 1.5em;
+    color: var(--color-secondary);
+    text-decoration: none;
+    line-height: 1; 
+    font-weight: 700;
+}
+
+main {
+    padding: 15px;
+    /* Un padding top peut être nécessaire ici si le header fixe chevauche le premier élément */
+    /* Cependant, 'sticky' devrait éviter cela naturellement. */
+}
+
+/* ⭐ STYLE POUR LE LOGO DE LAND ⭐ */
+.land-header-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center; 
+    margin-top: 30px;
+    margin-bottom: 10px;
+    padding: 10px 0;
+}
+
+.land-logo {
+    max-width: 150px; 
+    height: auto;
+    margin-bottom: 5px;
+}
+
+.land-header {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.3em; 
+    font-weight: 600;
+    color: var(--color-text-light); 
+    margin: 0;
+    text-align: center;
+}
+
+/* --- Liste des Attractions (UX) --- */
+.attraction-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px; 
+    max-width: 700px;
+    margin: 20px auto;
+}
+
+.attraction-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--attraction-card-bg); 
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+    transition: background-color 0.2s;
+}
+
+.attraction-card:hover {
+    background-color: #2a2a50; 
+}
+
+.attraction-info {
+    text-align: left;
+    flex-grow: 1;
+}
+
+.attraction-info h3 {
+    font-size: 1.2em;
+    margin: 0 0 5px 0;
+    color: var(--color-text-light);
+    font-weight: 600;
+}
+
+.attraction-info p {
+    font-size: 0.85em;
+    margin: 0;
+    color: #b0b0d0; 
+}
+
+/* --- Temps d'Attente (Affichage des Chiffres) --- */
+.wait-time {
+    font-family: 'Poppins', sans-serif; 
+    font-size: 2em;
+    font-weight: 700;
+    margin-left: 15px;
+    padding: 8px 15px;
+    border-radius: 6px;
+    min-width: 70px; 
+    text-align: center;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+}
+
+/* --- COULEURS DES TEMPS D'ATTENTE (avec !important) --- */
+
+/* ⭐ ANIMATION : Alternance Doré / Bleu Clair ⭐ */
+@keyframes goldFlash {
+    0%, 100% { 
+        background-color: #ffc72c !important; 
+        color: var(--color-primary) !important;
+        transform: scale(1);
+    }
+    50% { 
+        background-color: var(--color-text-light) !important; 
+        color: var(--color-primary) !important;
+        transform: scale(1.05); 
+    }
+}
+
+.time-gold {
+    background-color: #ffc72c !important; 
+    color: var(--color-primary) !important;
+    animation: goldFlash 0.7s infinite alternate ease-in-out; 
+}
+
+.time-green {
+    background-color: var(--color-green) !important; 
+    color: var(--color-text-light) !important;
+}
+
+.time-orange {
+    background-color: #ff8c00 !important; 
+    color: var(--color-text-light) !important;
+}
+
+/* Indisponible/Fermé en ROUGE avec !important */
+.time-red, .status-closed, .status-refurb {
+    background-color: var(--color-red) !important; 
+    color: var(--color-text-light) !important;
+    font-size: 0.9em !important; 
+    line-height: 1.2 !important;
+    padding: 12px 8px !important;
+}
+
+
+/* ============================== */
+/* ⭐ MEDIA QUERIES (Responsive) ⭐ */
+/* ============================== */
+
+@media (max-width: 480px) {
+    .park-header h1 {
+        font-size: 1.6em; 
+        margin-left: 15px; 
+    }
+
+    .land-logo {
+        max-width: 120px; 
+    }
+    
+    .land-header {
+        font-size: 1.1em; 
+    }
+
+    .attraction-card {
+        padding: 10px;
+    }
+
+    .attraction-info h3 {
+        font-size: 1.1em; 
+    }
+
+    .wait-time {
+        font-size: 1.6em; 
+        padding: 6px 10px;
+        min-width: 60px; 
+        margin-left: 10px;
+    }
+
+    .status-closed, .status-refurb {
+        font-size: 0.8em !important; 
+        padding: 10px 6px !important;
+        min-width: 60px; 
+    }
+}

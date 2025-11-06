@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DLP Times : Temps d'Attente Disneyland Paris</title> 
+    <link rel="manifest" href="./manifest.json">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="./css/index.css">
+    <meta name="mobile-web-app-capable" content="yes">
+</head>
+<body>
+<header>
+        <button id="installButton" style="display:none;" title="Installer l'application">
+            ⭐ Installer
+        </button>
+        <h1>DLP Times</h1> 
+        <h2>Sélectionnez le Parc pour voir les temps d'attente</h2>
+    </header>
+
+    <main>
+        <div class="park-selection">
+            
+            <a href="disneyland_park.html" class="park-card">
+                <div class="park-content">
+                    <h3>Disneyland Park</h3>
+                    <p>Le Parc historique et ses Lands emblématiques.</p>
+                </div>
+                <img src="./imgs/dlppark.png" alt="Château de Disneyland Park" class="park-image">
+            </a>
+            
+            <a href="disneyland_studios.html" class="park-card studios">
+                <div class="park-content">
+                    <h3>Walt Disney Studios</h3>
+                    <p>Le Parc dédié au cinéma et aux super-héros.</p>
+                </div>
+                <img src="./imgs/dlpstudios.png" alt="Tour de la Terreur de Walt Disney Studios" class="park-image">
+            </a>
+        </div>
+    </main>
+
+    <script src="./js/pwa_register.js"></script>
+</body>
+</html>

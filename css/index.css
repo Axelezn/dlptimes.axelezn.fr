@@ -1,0 +1,196 @@
+/* --- NOUVEAU THÈME : BLEU NUIT & DORÉ --- */
+
+:root {
+    --color-primary: #00287a; /* Bleu foncé de DLP */
+    --color-secondary: #ffc72c; /* Doré/Jaune (couleur d'accentuation) */
+    --color-text-light: #f4f4f4; /* Texte clair */
+    --color-text-dark: #333; /* Texte foncé */
+    --color-bg-light: #ffffff;
+    --color-bg-dark: #12122b; /* Fond bleu nuit */
+    --card-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+}
+
+/* Base et Typographie */
+body {
+    font-family: 'Poppins', sans-serif; 
+    background-color: var(--color-bg-dark); /* Nouveau fond bleu nuit */
+    color: var(--color-text-light);
+    margin: 0;
+    padding: 0;
+    text-align: center;
+}
+
+header {
+    background-color: var(--color-primary);
+    padding: 20px 15px;
+    border-bottom: 3px solid var(--color-secondary);
+    position: relative; 
+}
+
+h1 {
+    font-size: 2.5em;
+    color: var(--color-secondary); /* Titre en doré */
+    margin: 0 0 5px 0;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+h2 {
+    font-size: 1.1em;
+    font-weight: 300;
+    color: var(--color-text-light);
+    margin: 0;
+}
+
+main {
+    padding: 20px;
+}
+
+/* Bouton d'Installation */
+#installButton {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background-color: var(--color-secondary);
+    color: var(--color-primary);
+    border: none;
+    padding: 8px 12px;
+    border-radius: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    transition: background-color 0.2s;
+    font-size: 0.85em;
+}
+
+#installButton:hover {
+    background-color: #ffd966;
+}
+
+/* Sélection des Parcs (UX améliorée) */
+.park-selection {
+    display: flex;
+    flex-direction: column;
+    gap: 25px; 
+    max-width: 600px;
+    margin: 30px auto;
+}
+
+.park-card {
+    display: block;
+    position: relative;
+    overflow: hidden;
+    height: 180px; /* Hauteur fixe pour les cartes */
+    border-radius: 12px;
+    text-decoration: none;
+    box-shadow: var(--card-shadow);
+    transition: transform 0.2s, box-shadow 0.2s;
+    border: 2px solid var(--color-secondary); /* Bordure dorée */
+}
+
+.park-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.6);
+}
+
+.park-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; 
+    opacity: 0.6; 
+    transition: opacity 0.2s;
+}
+
+.park-card:hover .park-image {
+    opacity: 0.8;
+}
+
+.park-content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.3); 
+    padding: 15px;
+    text-align: center;
+    z-index: 10;
+}
+
+.park-content h3 {
+    color: var(--color-secondary); 
+    font-size: 1.8em;
+    margin-bottom: 5px;
+    text-shadow: 1px 1px 2px var(--color-primary);
+}
+
+.park-content p {
+    color: var(--color-text-light);
+    font-size: 0.95em;
+    font-weight: 300;
+}
+
+
+/* ============================== */
+/* ⭐ MEDIA QUERIES (Responsive pour Mobiles) ⭐ */
+/* ============================== */
+
+/* Pour les petits téléphones (moins de 480px) */
+@media (max-width: 480px) {
+    header {
+        padding: 15px 10px; /* Réduction du padding du header */
+    }
+
+    h1 {
+        font-size: 1.8em; /* Réduction de la taille du titre principal */
+    }
+    
+    h2 {
+        font-size: 1em; /* Réduction du sous-titre */
+    }
+
+    #installButton {
+        top: 10px;
+        right: 10px;
+        padding: 6px 10px; /* Bouton plus petit */
+        font-size: 0.75em;
+    }
+
+    main {
+        padding: 15px 10px;
+    }
+
+    .park-selection {
+        gap: 20px; /* Réduction de l'espace entre les cartes */
+        margin: 20px auto;
+    }
+
+    .park-card {
+        height: 150px; /* Réduction de la hauteur des cartes */
+    }
+
+    .park-content h3 {
+        font-size: 1.5em; /* Réduction du titre de la carte */
+    }
+
+    .park-content p {
+        font-size: 0.85em; /* Réduction du texte secondaire */
+    }
+}
+
+/* Media Query pour les écrans plus larges (reste inchangé) */
+@media (min-width: 768px) {
+    .park-selection {
+        flex-direction: row;
+        gap: 30px;
+        max-width: 900px;
+    }
+
+    .park-card {
+        flex: 1;
+        height: 250px;
+    }
+}

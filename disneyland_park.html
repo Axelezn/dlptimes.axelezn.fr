@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disneyland Park - Temps d'Attente</title>
+    <link rel="manifest" href="./manifest.json">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="./css/park-styles.css">
+    <meta name="mobile-web-app-capable" content="yes">
+</head>
+<body>
+
+    <header class="park-header">
+        <a href="./index.html" class="back-link" title="Retour à la sélection des parcs">←</a>
+        <h1 class="park-title-dlp">Disneyland Park</h1>
+    </header>
+
+    <main>
+        <section class="attraction-list" id="attractions-list">
+             <div class="loading-message">
+                ⌛ Chargement initial des temps d'attente...
+            </div>
+        </section>
+    </main>
+    
+    <script src="./js/pwa_register.js"></script>
+    <script src="./js/timetables.js"></script> 
+    <script src="./js/app-park.js"></script>
+
+</body>
+</html>
