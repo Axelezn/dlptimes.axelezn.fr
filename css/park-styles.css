@@ -57,8 +57,6 @@ body {
 
 main {
     padding: 15px;
-    /* Un padding top peut être nécessaire ici si le header fixe chevauche le premier élément */
-    /* Cependant, 'sticky' devrait éviter cela naturellement. */
 }
 
 /* ⭐ STYLE POUR LE LOGO DE LAND ⭐ */
@@ -128,22 +126,36 @@ main {
     color: #b0b0d0; 
 }
 
+/* ⭐ NOUVEAU CONTENEUR POUR EMPILER LES TEMPS (STANDBY + SINGLE RIDER) ⭐ */
+.wait-times-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end; /* Aligner les encadrés à droite */
+    gap: 5px; /* Petit espace entre les encadrés */
+    margin-left: 15px;
+}
+
 /* --- Temps d'Attente (Affichage des Chiffres) --- */
+/* (Ce style s'applique à la fois au temps standard et aux statuts spéciaux) */
 .wait-time {
     font-family: 'Poppins', sans-serif; 
     font-size: 2em;
     font-weight: 700;
-    margin-left: 15px;
+    /* margin-left est géré par wait-times-container */
     padding: 8px 15px;
     border-radius: 6px;
     min-width: 70px; 
     text-align: center;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+    
+    /* Permet aux éléments Single Rider d'être plus petits sans que le conteneur soit trop large */
+    width: auto; 
+    min-width: 0; 
 }
 
 /* --- COULEURS DES TEMPS D'ATTENTE (avec !important) --- */
 
-/* ⭐ ANIMATION : Alternance Doré / Bleu Clair ⭐ */
+/* ⭐ ANIMATION : Alternance Doré / Bleu Clair (Fond ou Boîte) ⭐ */
 @keyframes goldFlash {
     0%, 100% { 
         background-color: #ffc72c !important; 
@@ -154,6 +166,16 @@ main {
         background-color: var(--color-text-light) !important; 
         color: var(--color-primary) !important;
         transform: scale(1.05); 
+    }
+}
+
+/* ⭐ ANIMATION : Texte qui clignote (pour le Compte à Rebours) ⭐ */
+@keyframes goldFlashText {
+    0%, 100% { 
+        color: var(--color-secondary) !important;
+    }
+    50% { 
+        color: var(--color-text-light) !important; 
     }
 }
 
@@ -173,8 +195,26 @@ main {
     color: var(--color-text-light) !important;
 }
 
-/* Indisponible/Fermé en ROUGE avec !important */
-.time-red, .status-closed, .status-refurb {
+/* ⭐ CLASSE SÉPARÉE : TEMPS D'ATTENTE ROUGE (taille normale) ⭐ */
+.time-red {
+    background-color: var(--color-red) !important; 
+    color: var(--color-text-light) !important;
+    /* Hérite de la taille et du padding de .wait-time */
+}
+
+/* ⭐ NOUVELLE CLASSE : STATUT OUVERT (pour 0 min) ⭐ */
+.status-opened {
+    background-color: var(--color-green) !important; /* Fond Vert */
+    color: var(--color-text-light) !important; /* Texte Blanc */
+    
+    /* Reprend la taille et le padding du statut 'fermé' pour être plus compact */
+    font-size: 0.9em !important; 
+    line-height: 1.2 !important;
+    padding: 12px 8px !important; 
+}
+
+/* Indisponible/Fermé en ROUGE (taille réduite) */
+.status-closed, .status-refurb { 
     background-color: var(--color-red) !important; 
     color: var(--color-text-light) !important;
     font-size: 0.9em !important; 
@@ -182,17 +222,330 @@ main {
     padding: 12px 8px !important;
 }
 
+/* ⭐ CLASSE : RÉSERVATION / FILE VIRTUELLE ⭐ */
+.status-reservation {
+    background-color: #5bc0de !important; /* Bleu ciel pour une distinction claire */
+    color: var(--color-primary) !important; /* Texte foncé pour un meilleur contraste */
+    font-size: 0.9em !important; 
+    line-height: 1.2 !important;
+    padding: 12px 8px !important;
+}
+
+/* ⭐ CLASSE : STAND DE TIR PAYANT ⭐ */
+.status-payant {
+    background-color: var(--color-secondary) !important; /* Doré/Jaune */
+    color: var(--color-primary) !important; /* Texte bleu foncé */
+    font-size: 1em !important; 
+    line-height: 1.2 !important;
+    padding: 10px 8px !important;
+    font-weight: 700 !important;
+}
+
+/* ⭐ CLASSE : SINGLE RIDER (Vert, plus petit) ⭐ */
+.status-single-rider {
+    background-color: var(--color-green) !important; 
+    color: var(--color-text-light) !important;
+    font-size: 0.9em !important; 
+    line-height: 1 !important;
+    padding: 8px 10px !important;
+    font-weight: 500 !important;
+    min-width: auto !important; 
+}
+
+/* ⭐ NOUVELLE CLASSE : SINGLE RIDER FERMÉ (Rouge) ⭐ */
+.status-closed-single {
+    background-color: var(--color-red) !important; 
+    color: var(--color-text-light) !important;
+    font-size: 0.9em !important; 
+    line-height: 1 !important;
+    padding: 8px 10px !important;
+    font-weight: 500 !important;
+    min-width: auto !important; 
+}
+
+
+/* --- STYLES PREMIER ACCESS (DPA) --- */
+
+.dpa-details-container {
+    margin-top: 5px;
+    padding-top: 5px;
+    border-top: 1px dashed rgba(255, 255, 255, 0.1);
+    /* S'assurer que le conteneur DPA est sous les informations de l'attraction */
+}
+
+.dpa-toggle-header {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 3px 0;
+}
+
+.dpa-label {
+    font-size: 0.9em;
+    font-weight: 500;
+    margin: 0;
+    color: var(--color-secondary); /* Couleur Dorée pour attirer l'attention */
+    line-height: 1;
+}
+
+.dpa-toggle-icon {
+    margin-left: 8px;
+    font-size: 0.7em;
+    color: var(--color-secondary);
+    transition: transform 0.2s ease-in-out;
+    display: inline-block;
+    line-height: 1;
+}
+
+.dpa-toggle-icon.rotated {
+    transform: rotate(180deg);
+}
+
+/* Détails cachés */
+.dpa-details {
+    display: flex; /* Utilisé pour aligner les détails horizontalement */
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 5px;
+}
+
+.dpa-info {
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.8em;
+    font-weight: 600;
+    padding: 5px 8px;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    line-height: 1;
+    white-space: nowrap;
+}
+
+.dpa-price {
+    background-color: var(--color-secondary) !important; /* Jaune/Doré */
+    color: var(--color-primary) !important; /* Texte bleu foncé */
+}
+
+.dpa-time {
+    background-color: var(--color-primary) !important; /* Bleu foncé */
+    color: var(--color-text-light) !important; /* Texte blanc/gris clair */
+    border: 1px solid var(--color-secondary);
+}
+
+
+/* --- STYLES POUR LA PAGE DES SPECTACLES (shows.html) --- */
+
+.park-show-header {
+    font-size: 1.8em;
+    font-weight: 700;
+    color: var(--color-secondary); 
+    text-align: center;
+    margin: 30px 0 15px 0;
+    padding-bottom: 5px;
+    border-bottom: 2px solid rgba(255, 199, 44, 0.5);
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.show-card {
+    display: flex;
+    flex-direction: column; 
+    background-color: var(--attraction-card-bg); 
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+    margin-bottom: 10px;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+    /* La carte ne change plus de couleur de fond, donc on garde sa couleur par défaut */
+    transition: all 0.2s ease-in-out;
+}
+
+.show-info h3 {
+    font-size: 1.3em;
+    margin: 0 0 5px 0;
+    color: var(--color-text-light);
+    font-weight: 600;
+}
+
+.show-park-land {
+    font-size: 0.9em;
+    margin: 0;
+    color: #b0b0d0; 
+}
+
+/* Conteneur des horaires et compte à rebours */
+.show-schedule {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed rgba(255, 255, 255, 0.1);
+}
+
+/* ⭐ BLOC : STYLES POUR LE COMPTE À REBOURS DU PROCHAIN SHOW ⭐ */
+.show-countdown {
+    text-align: center;
+    font-size: 1.1em;
+    font-weight: 700;
+    margin-bottom: 10px;
+    padding: 5px 0;
+    border-radius: 4px;
+    color: var(--color-text-light); 
+}
+
+.countdown-value {
+    font-size: 1.2em;
+    margin: 0 5px;
+}
+
+.countdown-default {
+    color: #b0b0d0; /* Gris clair */
+}
+
+.countdown-red {
+    color: var(--color-red); /* Rouge */
+}
+
+.countdown-orange {
+    color: #ff8c00; /* Orange */
+}
+
+.countdown-green {
+    color: var(--color-green); /* Vert */
+}
+
+.countdown-gold {
+    color: var(--color-secondary); /* Jaune/Doré - pour l'urgence maximale */
+    animation: goldFlashText 0.7s infinite alternate ease-in-out;
+}
+/* FIN DU BLOC COMPTE À REBOURS */
+
+
+/* Conteneur flex pour les encadrés d'heures */
+.show-times-container {
+    display: flex;
+    flex-wrap: wrap; 
+    gap: 8px; 
+    justify-content: center; 
+    margin: 0;
+    padding: 0;
+}
+
+/* Style de base pour chaque encadré d'heure (couleur par défaut : Jaune/Bleu) */
+.show-time-box {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1em;
+    font-weight: 600;
+    color: var(--color-primary); 
+    background-color: var(--color-secondary); 
+    padding: 5px 10px;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    line-height: 1;
+    white-space: nowrap; 
+    transition: all 0.2s ease-in-out;
+}
+
+/* --- STYLES D'IMMINENCE POUR LES ENCADRÉS D'HEURES (BOXES) --- */
+/* (Ces classes reprennent les styles de la classe .show-time-box + la couleur) */
+
+/* ⭐ NOUVEAU : > 60 min: White background, DLP Blue text ⭐ */
+.time-far-box {
+    background-color: var(--color-text-light) !important;
+    color: var(--color-primary) !important;
+    /* Réapplication des styles de base pour l'uniformité */
+    font-family: 'Poppins', sans-serif;
+    font-size: 1em;
+    font-weight: 600;
+    padding: 5px 10px;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    line-height: 1;
+    white-space: nowrap; 
+}
+
+/* ⭐ < 15 min: Gold Flash ⭐ */
+.time-gold-box {
+    background-color: #ffc72c !important; 
+    color: var(--color-primary) !important;
+    animation: goldFlash 0.7s infinite alternate ease-in-out; 
+    font-family: 'Poppins', sans-serif;
+    font-size: 1em;
+    font-weight: 600;
+    padding: 5px 10px;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    line-height: 1;
+    white-space: nowrap; 
+}
+
+/* ⭐ [45-59 min]: Green ⭐ */
+.time-green-box {
+    background-color: var(--color-green) !important;
+    color: var(--color-text-light) !important;
+    font-family: 'Poppins', sans-serif;
+    font-size: 1em;
+    font-weight: 600;
+    padding: 5px 10px;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    line-height: 1;
+    white-space: nowrap; 
+}
+
+/* ⭐ [30-44 min]: Orange ⭐ */
+.time-orange-box {
+    background-color: #ff8c00 !important;
+    color: var(--color-text-light) !important;
+    font-family: 'Poppins', sans-serif;
+    font-size: 1em;
+    font-weight: 600;
+    padding: 5px 10px;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    line-height: 1;
+    white-space: nowrap; 
+}
+
+/* ⭐ [15-29 min]: Red ⭐ */
+.time-red-box {
+    background-color: var(--color-red) !important;
+    color: var(--color-text-light) !important;
+    font-family: 'Poppins', sans-serif;
+    font-size: 1em;
+    font-weight: 600;
+    padding: 5px 10px;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    line-height: 1;
+    white-space: nowrap; 
+}
+
+
+/* Styles pour les statuts de spectacle */
+.show-card.show-status-closed {
+    opacity: 0.6;
+}
+
+.show-card .status-closed {
+    font-size: 1em;
+    color: var(--color-red) !important;
+    font-weight: 600;
+}
 
 /* ============================== */
 /* ⭐ MEDIA QUERIES (Responsive) ⭐ */
 /* ============================== */
 
 @media (max-width: 480px) {
+    
+    /* --- Général / Header --- */
     .park-header h1 {
         font-size: 1.6em; 
         margin-left: 15px; 
     }
 
+    /* --- Lands / Attractions --- */
     .land-logo {
         max-width: 120px; 
     }
@@ -209,16 +562,59 @@ main {
         font-size: 1.1em; 
     }
 
+    .wait-times-container {
+        margin-left: 10px;
+    }
+    
+    /* Réduction des grands encadrés de temps d'attente */
     .wait-time {
         font-size: 1.6em; 
         padding: 6px 10px;
         min-width: 60px; 
-        margin-left: 10px;
     }
 
-    .status-closed, .status-refurb {
+    /* ⭐ AJUSTEMENT DES STATUTS SPÉCIAUX POUR MOBILE ⭐ */
+    .status-closed, .status-refurb, .status-reservation, .status-payant, .status-opened { 
         font-size: 0.8em !important; 
         padding: 10px 6px !important;
         min-width: 60px; 
+    }
+    
+    /* ⭐ AJUSTEMENT SINGLE RIDER MOBILE ⭐ */
+    .status-single-rider, .status-closed-single {
+        font-size: 0.75em !important;
+        padding: 6px 8px !important;
+    }
+
+    /* ⭐ AJUSTEMENT PREMIER ACCESS MOBILE ⭐ */
+    .dpa-label {
+        font-size: 0.8em;
+    }
+    
+    .dpa-info {
+        font-size: 0.75em;
+        padding: 4px 6px;
+    }
+
+
+    /* ⭐ Media Queries pour les Shows (mobile) ⭐ */
+    .park-show-header {
+        font-size: 1.5em;
+        margin-top: 20px;
+    }
+    
+    .show-info h3 {
+        font-size: 1.1em;
+    }
+
+    /* Styles mobiles pour les encadrés d'heures et le nouveau far-box */
+    .show-time-box, .time-gold-box, .time-green-box, .time-orange-box, .time-red-box, .time-far-box {
+        font-size: 0.9em;
+        padding: 4px 8px;
+    }
+    
+    /* ⭐ Taille du compte à rebours sur mobile ⭐ */
+    .show-countdown {
+        font-size: 1em;
     }
 }

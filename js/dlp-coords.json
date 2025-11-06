@@ -1,0 +1,97 @@
+[
+  {
+    "name": "Big Thunder Mountain",
+    "type": "ATTRACTION",
+    "lat": 48.871520,
+    "lon": 2.774697
+  },
+  {
+    "name": "Phantom Manor",
+    "type": "ATTRACTION",
+    "lat": 48.870961,
+    "lon": 2.776820
+  },
+  {
+    "name": "Pirates of the Caribbean",
+    "type": "ATTRACTION",
+    "lat": 48.873480,
+    "lon": 2.773392
+  },
+  {
+    "name": "Star Wars Hyperspace Mountain",
+    "type": "ATTRACTION",
+    "lat": 48.873651,
+    "lon": 2.778828
+  },
+  {
+    "name": "Buzz Lightyear Laser Blast",
+    "type": "ATTRACTION",
+    "lat": 48.8731014,
+    "lon": 2.7777403
+  },
+  {
+    "name": "\"it's a small world\"",
+    "type": "ATTRACTION",
+    "lat": 48.8747156,
+    "lon": 2.7761095
+  },
+  {
+    "name": "Peter Pan's Flight",
+    "type": "ATTRACTION",
+    "lat": 48.8737943,
+    "lon": 2.7741201
+  },
+  {
+    "name" : "Main Street Vehicles",
+    "type" : "ATTRACTION",
+    "lat" : 48.8713348,
+    "lon" : 2.7789386
+  },
+  {
+    "name" : "Disneyland Railroad Main Street Station",
+    "type" : "ATTRACTION",
+    "lat" : 48.8708381,
+    "lon" : 2.7790840
+  },
+   {
+    "name" : "Rustler Roundup Shootin' Gallery",
+    "type" : "ATTRACTION",
+    "lat" : 48.8715714 ,
+    "lon" : 2.7756142
+  },
+   {
+    "name" : "Frontierland Playground",
+    "type" : "ATTRACTION",
+    "lat" :48.8703946 ,
+    "lon" : 2.7741863
+  },
+  {
+    "name" : "Disneyland Railroad Frontierland Depot",
+    "type" : "ATTRACTION",
+    "lat" : 48.8702377,
+    "lon" : 2.7722492
+  },
+ {
+    "name" : "Thunder Mesa Riverboat Landing",
+    "type" : "ATTRACTION",
+    "lat" : 48.8711877,
+    "lon" : 2.7764948
+ },
+ {
+    "name" : "Adventure Isle",
+    "type" : "ATTRACTION",
+    "lat" : 48.8727092,
+    "lon" : 2.7732087
+ }, {
+    "name" : "Le Passage Enchanté d'Aladdin",
+    "type" : "ATTRACTION",
+    "lat" : 48.8725260,
+    "lon" : 2.7754709
+ },
+ {
+    "name" : "Pirates' Beach",
+    "type" : "ATTRACTION",
+    "lat" : 48.8727193,
+    "lon" : 2.7737909
+ }
+]

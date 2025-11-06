@@ -1,4 +1,4 @@
-// js/app-studios.js - V7 (Final - Fix ID)
+// js/app-studios.js - V11 (Fixe l'extraction du Premier Access : utilise PAID_RETURN_TIME)
 
 // ⭐ CONSTANTES D'IDENTIFICATION ET DE RAFFRAICHISSEMENT
 const DESTINATION_ID = 'e8d0207f-da8a-4048-bec8-117aa946b2c2';
@@ -6,20 +6,21 @@ const STUDIOS_PARK_ID = 'ca888437-ebb4-4d50-aed2-d227f7096968';
 const API_URL = `https://api.themeparks.wiki/v1/entity/${DESTINATION_ID}/live`; 
 const REFRESH_INTERVAL = 90000; 
 
+// ⭐ CONSTANTES DES ATTRACTIONS AVEC RÉSERVATION / FILE VIRTUELLE (WDS) ⭐
+const VIRTUAL_QUEUE_ATTRACTIONS_STUDIOS = [
+    // Liste à compléter si besoin
+];
+
 // --- DÉFINITION DES ZONES (LANDS) pour les Studios ---
 function getLandName(attraction) {
     const externalId = attraction.externalId || '';
     
-    // Logique basée sur les IDs externes
     if (externalId.startsWith('P2AC')) return "Avengers Campus"; 
     if (externalId.startsWith('P2TM')) return "Toon Studio"; 
     if (externalId.startsWith('P2HA')) return "Hollywood Boulevard"; 
     if (externalId.startsWith('P2ZA')) return "Production Courtyard / Front Lot";
     if (externalId.startsWith('P2XA0')) return "Worlds of Pixar";
-    //if (externalId.startsWith('P2XA03')) return "World of Pixar";
-    //if (externalId.startsWith('P2XA09')) return "World of Pixar";
     
-    // P2E est souvent Worlds of Pixar (Ratatouille, Crush)
     if (externalId.startsWith('P2E')) return "Worlds of Pixar"; 
     
     if (attraction.name.includes("Studio Theater") || attraction.name.includes("Front Lot")) return "Production Courtyard / Front Lot"; 
@@ -27,8 +28,6 @@ function getLandName(attraction) {
     return "Autre / Non Classé"; 
 }
 
-// ⭐ FONCTION UTILITAIRE : Normalise le nom du Land pour le chemin du fichier PNG
-// (Copie exacte de app-park.js)
 function getLogoFileName(landName) {
     return landName
         .toLowerCase()
@@ -37,24 +36,102 @@ function getLogoFileName(landName) {
 }
 
 /**
- * Génère la chaîne HTML complète pour une carte d'attraction (Copie de app-park.js).
+ * Génère la chaîne HTML complète pour une carte d'attraction, incluant Single Rider et PREMIER ACCESS.
  */
 function createAttractionCardHtml(attraction, land) {
     let waitHtml = '';
+    let singleRiderHtml = ''; 
+    let dpaHtml = ''; 
+
+    // ⭐ CORRECTION DE L'EXTRACTION DPA VERS PAID_RETURN_TIME ⭐
+    const dpaQueue = attraction.queue?.PAID_RETURN_TIME; // <-- CLÉ CORRIGÉE
+    const dpaStartTime = dpaQueue?.returnStart;          // <-- CLÉ CORRIGÉE
+    const dpaEndTime = dpaQueue?.returnEnd;              // <-- CLÉ CORRIGÉE
+    const dpaPriceFormatted = dpaQueue?.price?.formatted; // <-- CLÉ CORRIGÉE
+
+    // Le Premier Access est disponible si l'objet DPA existe et contient les heures
+    const isDpaAvailable = dpaQueue && dpaStartTime && dpaEndTime; 
+    
     let waitTime = attraction.queue?.STANDBY?.waitTime ?? null;
+    let singleRiderTime = attraction.queue?.SINGLE_RIDER?.waitTime ?? null; 
+    
     let finalClass = '';
+    const attractionName = attraction.name; 
 
-    if (attraction.status === 'OPERATING' && waitTime !== null && waitTime >= 0) {
-        finalClass = (typeof getTimeClass === 'function') ? 
-                            getTimeClass(attraction.name, waitTime) : 'time-default'; 
+    // 1. GESTION DU TEMPS D'ATTENTE STANDARD
+    if (attraction.status === 'OPERATING') {
         
-        waitHtml = `
-            <div class="wait-time ${finalClass}">
-                ${waitTime} min
-            </div>
-        `;
+        const isVirtualQueue = VIRTUAL_QUEUE_ATTRACTIONS_STUDIOS.includes(attractionName);
 
-    } else {
+        if (isVirtualQueue && (waitTime === 0 || waitTime === null)) {
+             statusText = 'Réservation';
+             finalClass = 'status-reservation'; 
+             waitHtml = `<div class="wait-time ${finalClass}">${statusText}</div>`;
+             
+        } else if (waitTime !== null && waitTime >= 0) { 
+             finalClass = (typeof getTimeClass === 'function') ? 
+                             getTimeClass(attractionName, waitTime) : 'time-default'; 
+             
+             waitHtml = `
+                 <div class="wait-time ${finalClass}">
+                     ${waitTime} min
+                 </div>
+             `;
+             
+        } else {
+             statusText = 'Ouvert';
+             finalClass = 'time-default'; 
+             waitHtml = `<div class="wait-time ${finalClass}">${statusText}</div>`;
+        }
+        
+        // 2. LOGIQUE SINGLE RIDER
+        if (singleRiderTime !== null && singleRiderTime >= 0) {
+            let srStatusText = '';
+            let srFinalClass = '';
+            
+            if (singleRiderTime === 0) {
+                 srStatusText = 'Single Rider : Fermé';
+                 srFinalClass = 'status-closed-single'; 
+            } else {
+                 srStatusText = `Single Rider : ${singleRiderTime} min`;
+                 srFinalClass = 'status-single-rider';
+            }
+            
+            singleRiderHtml = `
+                <div class="wait-time single-rider-time ${srFinalClass}">
+                    ${srStatusText}
+                </div>
+            `;
+        }
+        
+        // 3. ⭐ LOGIQUE PREMIER ACCESS (DPA) avec heures corrigées ⭐
+        if (isDpaAvailable) {
+            // Extraction HH:MM (index 11 à 16)
+            const formattedStartTime = dpaStartTime.substring(11, 16);
+            const formattedEndTime = dpaEndTime.substring(11, 16);
+            
+            // Le prix formaté inclut déjà la devise (€)
+            const displayPrice = dpaPriceFormatted || 'Prix NC'; 
+
+            dpaHtml = `
+                <div class="dpa-details-container">
+                    <div class="dpa-toggle-header">
+                        <p class="dpa-label">Premier Access ⚡</p>
+                        <span class="dpa-toggle-icon">▼</span> 
+                    </div>
+                    <div class="dpa-details" style="display:none;">
+                        <span class="dpa-info dpa-price">Prix : ${displayPrice}</span>
+                        <span class="dpa-info dpa-time">Retour pour : ${formattedStartTime} - ${formattedEndTime}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+
+    } 
+    
+    // GESTION DES ATTRACTIONS FERMÉES/RÉNOVATION
+    else {
         let statusText = '';
         if (attraction.status === 'CLOSED' || waitTime === null) {
              statusText = 'Fermé';
@@ -65,35 +142,53 @@ function createAttractionCardHtml(attraction, land) {
         }
         
         finalClass = 'status-closed'; 
-        waitHtml = `
-            <div class="wait-time ${finalClass}">
-                ${statusText}
-            </div>
-        `;
+        waitHtml = `<div class="wait-time ${finalClass}">${statusText}</div>`;
     }
-
+    
     return `
         <div class="attraction-card">
             <div class="attraction-info">
-                <h3>${attraction.name}</h3>
+                <h3>${attractionName}</h3>
                 <p>${land}</p>
+                ${dpaHtml} </div>
+            <div class="wait-times-container">
+                ${waitHtml}
+                ${singleRiderHtml}
             </div>
-            ${waitHtml}
         </div>
     `;
 }
 
-// --- FONCTION PRINCIPALE DE LANCEMENT ---
+// ⭐ FONCTION : Active la bascule (toggle) du Premier Access ⭐ (AUCUN CHANGEMENT)
+function setupDpaToggle() {
+    document.querySelectorAll('.dpa-toggle-header').forEach(header => {
+        header.addEventListener('click', function() {
+            const details = this.nextElementSibling;
+            const icon = this.querySelector('.dpa-toggle-icon');
+            
+            if (details.style.display === 'none' || details.style.display === '') {
+                // Déplie
+                details.style.display = 'flex'; // Utilise flex pour l'alignement
+                icon.classList.add('rotated');
+            } else {
+                // Replie
+                details.style.display = 'none';
+                icon.classList.remove('rotated');
+            }
+        });
+    });
+}
+
+
+// --- FONCTION PRINCIPALE DE LANCEMENT (AUCUN CHANGEMENT MAJEUR) ---
 document.addEventListener('DOMContentLoaded', () => {
     fetchAttractionTimes();
     setInterval(fetchAttractionTimes, REFRESH_INTERVAL);
 });
 
 async function fetchAttractionTimes() {
-    // ⭐ CIBLE WDS : attractions-list-studios. C'est le point clé de la correction. ⭐
     const listElement = document.getElementById('attractions-list-studios'); 
     
-    // Vérification de sécurité (qui ne devrait plus être nécessaire avec le HTML ci-dessus)
     if (listElement === null) {
         console.error("Erreur Critique: L'élément HTML de la liste WDS ('attractions-list-studios') est introuvable.");
         return; 
@@ -131,7 +226,6 @@ async function fetchAttractionTimes() {
             return acc;
         }, {});
 
-        // Ordre des Lands pour les Studios
         const landOrder = ["Hollywood Boulevard", "Production Courtyard / Front Lot", "Toon Studio", "Worlds of Pixar", "Avengers Campus", "Autre / Non Classé"];
         
         // Génération du HTML
@@ -139,7 +233,6 @@ async function fetchAttractionTimes() {
             const attractionsInLand = attractionsByLand[land];
             if (attractionsInLand && attractionsInLand.length > 0) {
                 
-                // Ajout du conteneur de logo et du titre Land
                 const logoFileName = getLogoFileName(land);
                 listElement.innerHTML += `
                     <div class="land-header-container">
@@ -165,6 +258,9 @@ async function fetchAttractionTimes() {
                 });
             }
         });
+        
+        // APPEL DE LA FONCTION DE MISE EN PLACE DE LA BASUCULE DPA
+        setupDpaToggle(); 
 
     } catch (error) {
         console.error("Erreur lors de la récupération des données de l'API (Studios Park) :", error);

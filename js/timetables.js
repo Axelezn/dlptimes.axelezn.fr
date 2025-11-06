@@ -101,6 +101,11 @@ const ATTRACTION_THRESHOLDS = {
         { maxTime: 45, className: 'time-orange' },
         { maxTime: Infinity, className: 'time-red' }
     ],
+        "Main Street Vehicles": [
+        { maxTime: 30, className: 'time-green' },
+        { maxTime: 45, className: 'time-orange' },
+        { maxTime: Infinity, className: 'time-red' }
+    ],
 
     // ====================================================================
     // 🎬 WALT DISNEY STUDIOS PARK - SEUILS SUGGERÉS

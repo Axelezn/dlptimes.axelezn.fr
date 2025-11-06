@@ -1,6 +1,6 @@
 // sw.js (TEST V14 - Retrait des HTML secondaires)
 // Incrémentez la version à chaque changement dans la liste 'urlsToCache'
-const CACHE_NAME = 'dlp-wait-times-cache-v15'; // ⭐ NOUVEAU CACHE
+const CACHE_NAME = 'dlp-wait-times-cache-v16'; // ⭐ NOUVEAU CACHE
 
 // Liste des fichiers statiques à mettre en cache lors de l'installation
 const urlsToCache = [
@@ -8,6 +8,12 @@ const urlsToCache = [
   './', 
   './index.html',
   './manifest.json',
+
+// Dossier HTML 
+    './disneyland_park.html',
+    './disneyland_studios.html',
+    './shows.html',
+    './live-map.html',
 
   // DOSSIER CSS
   './css/index.css',
@@ -18,6 +24,9 @@ const urlsToCache = [
   './js/app-park.js', 
   './js/app-studios.js',
   './js/pwa_register.js',
+  './js/dlp-coords.json',
+    './js/app-shows.js',
+    './js/app-map.js',
 
   // DOSSIER IMGS (Images et Icônes PWA)
   './imgs/dlppark.png', 
