@@ -69,7 +69,7 @@ main {
 /* Sélection des Parcs (UX améliorée) */
 .park-selection {
     display: flex;
-    flex-direction: column;
+    flex-direction: column; /* Colonne unique par défaut (mobile) */
     gap: 25px; 
     max-width: 600px;
     margin: 30px auto;
@@ -79,12 +79,12 @@ main {
     display: block;
     position: relative;
     overflow: hidden;
-    height: 180px; /* Hauteur fixe pour les cartes */
+    height: 180px; 
     border-radius: 12px;
     text-decoration: none;
     box-shadow: var(--card-shadow);
     transition: transform 0.2s, box-shadow 0.2s;
-    border: 2px solid var(--color-secondary); /* Bordure dorée */
+    border: 2px solid var(--color-secondary); 
 }
 
 .park-card:hover {
@@ -113,10 +113,10 @@ main {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: center;
+    align-items: center; 
     background: rgba(0, 0, 0, 0.3); 
     padding: 15px;
-    text-align: center;
+    text-align: center; 
     z-index: 10;
 }
 
@@ -125,37 +125,41 @@ main {
     font-size: 1.8em;
     margin-bottom: 5px;
     text-shadow: 1px 1px 2px var(--color-primary);
+    width: 100%; /* ⭐ Assure que le titre prend toute la largeur ⭐ */
+    text-align: center; 
 }
 
 .park-content p {
     color: var(--color-text-light);
     font-size: 0.95em;
     font-weight: 300;
+    width: 100%; /* Assure que le paragraphe prend toute la largeur */
+    text-align: center;
 }
 
 
 /* ============================== */
-/* ⭐ MEDIA QUERIES (Responsive pour Mobiles) ⭐ */
+/* ⭐ MEDIA QUERIES (Responsive) ⭐ */
 /* ============================== */
 
-/* Pour les petits téléphones (moins de 480px) */
+/* Pour les petits téléphones (max-width: 480px) */
 @media (max-width: 480px) {
     header {
-        padding: 15px 10px; /* Réduction du padding du header */
+        padding: 15px 10px; 
     }
 
     h1 {
-        font-size: 1.8em; /* Réduction de la taille du titre principal */
+        font-size: 1.8em; 
     }
     
     h2 {
-        font-size: 1em; /* Réduction du sous-titre */
+        font-size: 1em; 
     }
 
     #installButton {
         top: 10px;
         right: 10px;
-        padding: 6px 10px; /* Bouton plus petit */
+        padding: 6px 10px; 
         font-size: 0.75em;
     }
 
@@ -164,33 +168,35 @@ main {
     }
 
     .park-selection {
-        gap: 20px; /* Réduction de l'espace entre les cartes */
+        gap: 20px; 
         margin: 20px auto;
     }
 
     .park-card {
-        height: 150px; /* Réduction de la hauteur des cartes */
+        height: 150px; 
     }
 
     .park-content h3 {
-        font-size: 1.5em; /* Réduction du titre de la carte */
+        font-size: 1.5em; 
     }
 
     .park-content p {
-        font-size: 0.85em; /* Réduction du texte secondaire */
+        font-size: 0.85em; 
     }
 }
 
-/* Media Query pour les écrans plus larges (reste inchangé) */
+/* Media Query pour les écrans plus larges (Tablette/Desktop) */
 @media (min-width: 768px) {
     .park-selection {
-        flex-direction: row;
+        flex-direction: row; /* Passage à l'alignement en ligne */
+        flex-wrap: wrap;     /* Permet un retour à la ligne */
+        justify-content: center; 
         gap: 30px;
         max-width: 900px;
     }
 
     .park-card {
-        flex: 1;
+        flex: 1 1 45%; /* Deux cartes par ligne (45% de largeur + gap) */
         height: 250px;
     }
 }

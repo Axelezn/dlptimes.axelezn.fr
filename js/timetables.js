@@ -21,7 +21,7 @@ const ATTRACTION_THRESHOLDS = {
     // FRONTIERLAND
     "Big Thunder Mountain": [
         { maxTime: 20, className: 'time-gold' },    // Excellent pour ce niveau de popularité
-        { maxTime: 40, className: 'time-green' },   // Acceptable
+        { maxTime: 46, className: 'time-green' },   // Acceptable
         { maxTime: 65, className: 'time-orange' },  // Long mais faisable
         { maxTime: Infinity, className: 'time-red' } // À éviter
     ],
@@ -70,9 +70,37 @@ const ATTRACTION_THRESHOLDS = {
         { maxTime: Infinity, className: 'time-orange' } 
     ],
     "Dumbo the Flying Elephant": [
-        { maxTime: 15, className: 'time-gold' },
-        { maxTime: 30, className: 'time-green' },
-        { maxTime: 45, className: 'time-orange' },
+        { maxTime: 10, className: 'time-gold' },
+        { maxTime: 20, className: 'time-green' },
+        { maxTime: 35, className: 'time-orange' },
+        { maxTime: Infinity, className: 'time-red' }
+    ],
+    "La Cabane des Robinson": [
+        { maxTime: 10, className: 'time-green' },
+        { maxTime: 20, className: 'time-orange' },
+        { maxTime: Infinity, className: 'time-red' } // Rarement long
+    ],
+    "Le Carrousel de Lancelot ": [
+        { maxTime: 5, className: 'time-gold' },
+        { maxTime: 20, className: 'time-green' },
+        { maxTime: 30, className: 'time-orange' },
+        { maxTime: Infinity, className: 'time-red' }
+    ],
+    "Le Pays des Contes de Fées, presented by Vittel": [
+        { maxTime: 10, className: 'time-gold' },
+        { maxTime: 20, className: 'time-green' },
+        { maxTime: 40, className: 'time-orange' },
+        { maxTime: Infinity, className: 'time-red' }
+    ],
+    "Blanche-Neige et les Sept Nains®": [
+        { maxTime: 20, className: 'time-gold' },
+        { maxTime: 35, className: 'time-green' },
+        { maxTime: 50, className: 'time-orange' },
+        { maxTime: Infinity, className: 'time-red' }
+    ],
+    "Alice's Curious Labyrinth": [
+        { maxTime: 10, className: 'time-green' },
+        { maxTime: 40, className: 'time-orange' },
         { maxTime: Infinity, className: 'time-red' }
     ],
 

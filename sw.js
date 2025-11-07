@@ -24,7 +24,7 @@ const urlsToCache = [
   './js/app-park.js', 
   './js/app-studios.js',
   './js/pwa_register.js',
-  './js/dlp-coords.json',
+    './js/dlp-coords.json',
     './js/app-shows.js',
     './js/app-map.js',
 

@@ -93,5 +93,233 @@
     "type" : "ATTRACTION",
     "lat" : 48.8727193,
     "lon" : 2.7737909
- }
+ },
+ {
+    "name" : "La Cabane des Robinson",
+    "type" : "ATTRACTION",
+    "lat" : 48.8724562,
+    "lon" : 2.7739413
+ },
+ {
+    "name" : "Indiana Jones™ and the Temple of Peril",
+    "type" : "ATTRACTION",
+    "lat" : 48.8724242,
+    "lon" : 2.7721034
+ },
+ {
+  "name" : "La Tanière du Dragon",
+  "type" : "ATTRACTION",
+  "lat" : 48.8728854,
+  "lon" : 2.7759651
+ },
+ {
+    "name" : "Le Carrousel de Lancelot ",
+    "type" : "ATTRACTION",
+    "lat" : 48.8737389,
+    "lon" : 2.7753721
+ },
+ {
+    "name" : "Dumbo the Flying Elephant",
+    "type" : "ATTRACTION",
+    "lat" : 48.8740315,
+    "lon" : 2.7748230
+ },
+ {
+    "name" : "Casey Jr. – le Petit Train du Cirque",
+    "type" : "ATTRACTION",
+    "lat" : 48.8754661,
+    "lon" : 2.7745474
+ },
+ {    
+    "name" : "Princess Pavilion",
+    "type" : "ATTRACTION",
+    "lat" : 48.8747620,
+    "lon" : 2.7755644
+ },
+ {
+    "name" : "Blanche-Neige et les Sept Nains®",
+    "type" : "ATTRACTION",
+    "lat" : 48.8735037,
+    "lon" : 2.7753241
+ },
+ {
+    "name" : "Alice's Curious Labyrinth",
+    "type" : "ATTRACTION",
+    "lat" : 48.8744540,
+    "lon" : 2.7745217
+ },
+ {
+    "name" : "Mad Hatter's Tea Cups",
+    "type" : "ATTRACTION",
+    "lat" : 48.8744139,
+    "lon" : 2.7751714
+ },
+ {
+    "name" : "Le Pays des Contes de Fées, presented by Vittel",
+    "type" : "ATTRACTION",
+    "lat" : 48.8752930,
+    "lon" : 2.7746816
+ },
+ {
+    "name" : "Les Voyages de Pinocchio",
+    "type" : "ATTRACTION",
+    "lat" : 48.8735835,
+    "lon" : 2.7752068
+ },
+ {
+    "name" : "Welcome to Starport: A Star Wars Encounter",
+    "type" : "ATTRACTION",
+    "lat" : 48.8746463,
+    "lon" : 2.7791236
+ },
+ {    
+    "name" : "Les Mystères du Nautilus",
+    "type" : "ATTRACTION",
+    "lat" : 48.8734237,
+    "lon" : 2.7796242
+ },
+ {
+    "name" : "Orbitron®",
+    "type" : "ATTRACTION",
+    "lat" : 48.8735738,
+    "lon" : 2.7783862
+ },
+ {
+    "name" : "Star Tours: The Adventures Continue*",
+    "type" : "ATTRACTION",
+    "lat" : 48.8746468,
+    "lon" : 2.7788042
+ },
+ {
+    "name" : "Autopia, presented by Avis",
+    "type" : "ATTRACTION",
+    "lat" : 48.8734308,
+    "lon" : 2.7787989
+ },
+ {
+    "name" : "The Twilight Zone Tower of Terror",
+    "type" : "ATTRACTION",
+    "lat" : 48.8667730,
+    "lon" : 2.7787991
+ },
+ {
+    "name" : "RC Racer",
+    "type" : "ATTRACTION",
+    "lat" : 48.8669219,
+    "lon" : 2.7766279
+ },
+ {
+    "name" : "Les Tapis Volants - Flying Carpets Over Agrabah®",
+    "type" : "ATTRACTION",
+    "lat" : 48.8682887,
+    "lon" : 2.7783706
+ },
+ {
+    "name" : "Slinky® Dog Zigzag Spin",
+    "type" : "ATTRACTION",
+    "lat" : 48.8670537,
+    "lon" : 2.7767289
+ },
+  {
+      "name" : "Toy Soldiers Parachute Drop",
+      "type" : "ATTRACTION",
+      "lat" : 48.8671473,
+      "lon" : 2.7774373
+  },
+  {
+      "name" : "Crush's Coaster",
+      "type" : "ATTRACTION",
+      "lat" : 48.8680494,
+      "lon" : 2.7781797
+  },
+  {
+      "name" : "Ratatouille : L’Aventure Totalement Toquée de Rémy​",
+      "type" : "ATTRACTION",
+      "lat" : 48.8675552,
+      "lon" : 2.7762505
+  },
+  {
+      "name" : "Cars Quatre Roues Rallye",
+      "type" : "ATTRACTION",
+      "lat" : 48.8677085,
+      "lon" : 2.7778539
+  },
+  {
+      "name" : "Cars ROAD TRIP",
+      "type" : "ATTRACTION",
+      "lat" : 48.8663554,
+      "lon" : 2.7748730
+  },
+  {
+      "name" : "Avengers Assemble: Flight Force",
+      "type" : "ATTRACTION",
+      "lat" : 48.8653224,
+      "lon" : 2.7794725
+  },
+  {
+      "name" : "Spider-Man W.E.B. Adventure",
+      "type" : "ATTRACTION",
+      "lat" : 48.8656332,
+      "lon" : 2.7794423
+  },
+  {
+      "name" : "Mickey’s PhilharMagic",
+      "type" : "SHOW",
+      "lat" : 48.8744870,
+      "lon" : 2.7797300
+  },
+  {
+      "name" : "Disney Tales of Magic",
+      "type" : "SHOW",
+      "lat" : 48.8726180,
+      "lon" : 2.7767602
+  },
+  {
+      "name" : "TOGETHER: a Pixar Musical Adventure",
+      "type" : "SHOW",
+      "lat" : 48.8670580,
+      "lon" : 2.7797977
+  },
+  {
+      "name" : "Disney Stars on Parade ",
+      "type" : "SHOW",
+      "lat" : 48.8746936,
+      "lon" : 2.7768545
+  },
+  {
+      "name" : "Stitch Live!",
+      "type" : "SHOW",
+      "lat" : 48.8666209,
+      "lon" : 2.7800245
+  },
+  {
+      "name" : "The Lion King: Rhythms of the Pride Lands",
+      "type" : "SHOW",
+      "lat" : 48.8703372,
+      "lon" : 2.7727021
+  },
+  {
+      "name" : "Frozen: A Musical Invitation",
+      "type" : "SHOW",
+      "lat" : 48.8675857,
+      "lon" : 2.7783485
+  }, 
+  {
+      "name" : "Doctor Strange: Mystery of the Mystics!",
+      "type" : "SHOW",
+      "lat" : 48.8654824,
+      "lon" : 2.7792539
+  },
+  {
+      "name" : "Mickey and the Magician",
+      "type" : "SHOW",
+      "lat" : 48.8679625,
+      "lon" : 2.7786992
+  },
+  {
+      "name" : "Animation Academy",
+      "type" : "SHOW",
+      "lat" : 48.8672315,
+      "lon" : 2.7786895
+  }
 ]

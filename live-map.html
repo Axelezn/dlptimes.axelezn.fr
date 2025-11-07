@@ -9,8 +9,13 @@
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
     
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="manifest" href="./manifest.json">
+    <link rel="icon" href="./imgs/icon-192.png">
+
 
     <style>
         /* Définition des Variables pour la cohérence des couleurs */
@@ -18,7 +23,12 @@
             --color-primary: #00287a; /* Bleu foncé de DLP */
             --color-secondary: #ffc72c; /* Doré/Jaune (couleur d'accentuation) */
             --color-text-light: #f4f4f4; 
-            --color-bg-dark: #12122b; /* Fond bleu nuit */
+            --color-bg-dark: #12122b; /* Fond bleu nuit de l'application */
+            
+            /* NOUVELLES VARIABLES POUR LE POPUP (plus claires) */
+            --popup-bg-color: #fcfcfc; /* Fond blanc cassé pour le popup */
+            --popup-text-color: #333; /* Texte gris foncé pour le popup */
+            --popup-border-color: #0056b3; /* Un bleu plus clair pour les bordures */
         }
         
         /* Base et Typographie (pour l'ensemble de la page) */
@@ -27,8 +37,8 @@
             margin: 0;
             padding: 0;
             font-family: 'Poppins', sans-serif; 
-            background-color: var(--color-bg-dark); /* Couleur de fond de l'application */
-            color: var(--color-text-light);
+            background-color: var(--color-bg-dark); /* Reste sombre pour le fond de l'APP */
+            color: var(--color-text-light); /* Texte clair pour les éléments hors popup */
         }
         
         /* Conteneur de la carte (Pleine Page) */
@@ -47,7 +57,7 @@
             position: sticky; 
             top: 0; 
             z-index: 1000; 
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4); /* Ombre pour le détacher du fond */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4); 
         }
 
         .park-header h1 {
@@ -78,61 +88,117 @@
             padding: 5px 8px;
             line-height: 30px;
             display: block;
-            /* Amélioration visuelle pour coller au style DLP */
             border-radius: 4px; 
             color: var(--color-primary); 
             font-weight: bold;
         }
 
-        /* --- STYLES DES TOOLTIPS (Encadrés d'attente) --- */
+        /* --- STYLES DES POPUPS (Simplifié et plus clair) --- */
 
-        /* 1. Classe de base (aspect général) */
+        /* Conteneur principal du popup Leaflet */
+        .leaflet-popup-content-wrapper {
+            background: var(--popup-bg-color); /* Fond clair */
+            color: var(--popup-text-color); /* Texte foncé */
+            border-radius: 6px; /* Coins légèrement arrondis */
+            padding: 0; 
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3); /* Ombre plus douce */
+            border: 1px solid var(--popup-border-color); /* Bordure légère */
+        }
+
+        /* Le triangle de la pointe du popup (l'arrow) */
+        .leaflet-popup-tip {
+            background: var(--popup-bg-color); /* Pointe de la même couleur que le fond */
+            box-shadow: none; 
+            border: 1px solid var(--popup-border-color); /* Bordure sur la pointe aussi */
+            border-top: none; /* Cache la bordure supérieure pour une jonction propre */
+            border-left: none; /* Cache la bordure latérale pour une jonction propre */
+        }
+        
+        /* Assure que la flèche est bien positionnée et ne dépasse pas */
+        .leaflet-popup-tip-container {
+            width: 30px; /* Taille de la pointe */
+            height: 15px; /* Hauteur de la pointe */
+            margin-top: -8px; /* Ajuste la position verticale */
+        }
+        .leaflet-popup-tip {
+            transform: rotate(45deg); /* Fait pivoter le carré pour obtenir un triangle */
+            width: 12px; /* Taille du carré avant rotation */
+            height: 12px; /* Taille du carré avant rotation */
+            margin: 0; /* Remet les marges à zéro pour un contrôle précis */
+            box-shadow: none; /* Pas d'ombre */
+            background-color: var(--popup-bg-color); /* Fond clair */
+            border: 1px solid var(--popup-border-color);
+        }
+        /* Masque les bordures non désirées pour le "triangle" */
+        .leaflet-popup-tip {
+            border-left-color: transparent;
+            border-top-color: transparent;
+            /* La couleur de la bordure est gérée par popup-border-color */
+        }
+
+        /* Contenu interne du popup (défini par createPopupContent) */
+        .map-popup {
+            padding: 12px 15px; /* Padding ajusté */
+            max-width: 250px; /* Légèrement plus large pour les noms longs */
+            text-align: left; /* Alignement du texte à gauche */
+        }
+
+        .map-popup h4 {
+            color: var(--color-primary); /* Titre en bleu foncé */
+            font-size: 1.1em;
+            font-weight: 600;
+            margin-top: 0;
+            margin-bottom: 8px;
+            border-bottom: 1px solid var(--popup-border-color); /* Ligne de séparation plus légère */
+            padding-bottom: 5px;
+            text-shadow: none; /* Pas d'ombre sur le texte du titre */
+        }
+
+        .map-popup p {
+            font-size: 0.88em; /* Taille de texte légèrement réduite pour plus de compacité */
+            line-height: 1.4;
+            margin-bottom: 8px;
+        }
+
+        /* Style pour les informations d'attente/horaires (le contenu des <p>) */
+        .map-popup strong {
+            color: var(--color-primary); /* Met en évidence les valeurs clés en bleu */
+            font-weight: 700;
+        }
+
+        /* Bouton de fermeture - CORRIGÉ POUR LA VISIBILITÉ */
+        .leaflet-popup-close-button {
+            color: var(--color-primary) !important; /* Bleu foncé pour la croix, avec !important pour s'assurer qu'elle est visible */
+            font-size: 1.4em; /* Taille légèrement plus petite */
+            right: 8px; /* Marge par rapport au bord droit */
+            top: 8px; /* Marge par rapport au bord haut */
+            background: transparent; /* Pas de fond */
+            border: none; /* Pas de bordure */
+            padding: 0; /* Pas de padding */
+            line-height: 1; /* Aligner la croix */
+            opacity: 0.8; /* Légèrement transparent */
+        }
+        .leaflet-popup-close-button:hover {
+            opacity: 1; /* Opaque au survol */
+        }
+        
+        /* --- STYLES DES TOOLTIPS (Encadrés d'attente) --- */
         .wait-time-tooltip {
             font-weight: bold;
             font-size: 14px;
             padding: 2px 6px;
             border-radius: 4px;
             border: none;
-            opacity: 0.95; /* Rendre un peu plus opaque pour mieux voir les couleurs */
+            opacity: 0.95; 
             box-shadow: 0 1px 4px rgba(0,0,0,0.5);
             white-space: nowrap;
         }
-
-        /* 2. Classes de couleurs dynamiques (Repris de la dernière version) */
-        /* Vert foncé (198754) & Vert clair (28a745) - Attente faible */
-        .wait-time-tooltip-198754, .wait-time-tooltip-28a745 {
-            background-color: #28a745; 
-            color: white;
-            border-color: #28a745;
-        }
-
-        /* Jaune (ffc107) - Attente modérée ou Rénovation */
-        .wait-time-tooltip-ffc107 {
-            background-color: #ffc107;
-            color: black; 
-            border-color: #ffc107;
-        }
-
-        /* Orange (fd7e14) - Attente élevée */
-        .wait-time-tooltip-fd7e14 {
-            background-color: #fd7e14;
-            color: white;
-            border-color: #fd7e14;
-        }
-
-        /* Rouge (dc3545) - Attente très élevée, Fermé, ou Hors service */
-        .wait-time-tooltip-dc3545 {
-            background-color: #dc3545;
-            color: white;
-            border-color: #dc3545;
-        }
-        
-        /* Bleu (0d6fdc) - Inconnu/Défaut (Utilisé pour le PA en Tooltip) */
-        .wait-time-tooltip-0d6fdc {
-            background-color: #0d6fdc;
-            color: white;
-            border-color: #0d6fdc;
-        }
+        /* Couleurs des tooltips (inchangées car déjà fonctionnelles) */
+        .wait-time-tooltip-198754, .wait-time-tooltip-28a745 { background-color: #28a745; color: white; border-color: #28a745; }
+        .wait-time-tooltip-ffc107 { background-color: #ffc107; color: black; border-color: #ffc107; }
+        .wait-time-tooltip-fd7e14 { background-color: #fd7e14; color: white; border-color: #fd7e14; }
+        .wait-time-tooltip-dc3545 { background-color: #dc3545; color: white; border-color: #dc3545; }
+        .wait-time-tooltip-0d6fdc { background-color: #0d6fdc; color: white; border-color: #0d6fdc; }
 
     </style>
 </head>
@@ -146,8 +212,9 @@
     <div id="map">Chargement de la carte...</div> 
     
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 
-    <script src="./js/app-map.js"></script> 
+    <script src="js/app-map.js"></script> 
 
 </body>
 </html>
