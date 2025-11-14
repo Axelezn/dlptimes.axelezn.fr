@@ -24,7 +24,7 @@ Ce projet ne nécessite aucune compilation ou dépendance externe côté serveur
 ### Étapes
 1.  **Cloner le dépôt :**
     ```bash
-    git clone [VOTRE_LIEN_GITHUB]
+    git clone [https://github.com/Axelezn/dlptimes.axelezn.fr.git]
     cd disneyland-wait-times
     ```
 2.  **Lancer l'application :**
