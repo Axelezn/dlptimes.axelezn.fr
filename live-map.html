@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <title>Carte Live Disneyland Paris</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="manifest" href="./manifest.json">
+    <link rel="icon" href="./imgs/icon-192.png">
+    <link rel="stylesheet" href="./css/map-style.css">
+</head>
+<body>
+
+    <header class="park-header">
+        <a href="./index.html" class="back-link" title="Retour">←</a>
+        <h1 class="park-title-dlp">Carte Live DLP</h1>
+    </header>
+
+    <div id="map">Chargement de la carte...</div> 
+    
+    <div class="filter-toggle-button">
+        <button id="toggle-filter-btn" title="Filtrer">&#x2699;</button>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+    
+    <script src="js/app-map.js"></script> 
+    <script src="js/pwa_register.js"></script>
+
+</body>
+</html>

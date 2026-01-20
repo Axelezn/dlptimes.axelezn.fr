@@ -20,8 +20,8 @@ const ATTRACTION_THRESHOLDS = {
     
     // FRONTIERLAND
     "Big Thunder Mountain": [
-        { maxTime: 20, className: 'time-gold' },    // Excellent pour ce niveau de popularité
-        { maxTime: 40, className: 'time-green' },   // Acceptable
+        { maxTime: 25, className: 'time-gold' },    // Excellent pour ce niveau de popularité
+        { maxTime: 46, className: 'time-green' },   // Acceptable
         { maxTime: 65, className: 'time-orange' },  // Long mais faisable
         { maxTime: Infinity, className: 'time-red' } // À éviter
     ],
@@ -32,9 +32,15 @@ const ATTRACTION_THRESHOLDS = {
         { maxTime: Infinity, className: 'time-red' } // Au-delà, c'est Rouge
     ],
     "Thunder Mesa Riverboat Landing": [
-        { maxTime: 5, className: 'time-gold' },    
-        { maxTime: 15, className: 'time-green' },
+        { maxTime: 10, className: 'time-gold' },    
+        { maxTime: 25, className: 'time-green' },
+        { maxTime: 40, className: 'time-orange' },
         { maxTime: Infinity, className: 'time-orange' } // Très rarement long
+    ],
+    "Disneyland Railroad Frontierland Depot": [
+        { maxTime: 15, className: 'time-green' },
+        { maxTime: 35, className: 'time-orange' },
+        { maxTime: Infinity, className: 'time-orange' }
     ],
 
     // ADVENTURELAND
@@ -47,45 +53,90 @@ const ATTRACTION_THRESHOLDS = {
     "Pirates of the Caribbean": [
         { maxTime: 15, className: 'time-gold' },    
         { maxTime: 30, className: 'time-green' },   
-        { maxTime: 50, className: 'time-orange' },  
+        { maxTime: 45, className: 'time-orange' },  
         { maxTime: Infinity, className: 'time-red' } 
+    ],
+    "La Cabane des Robinson":[
+        { maxTime: 5, className: 'time-green' },
+        { maxTime: 10, className: 'time-orange' },
+        { maxTime: Infinity, className: 'time-red' } // Rarement long
+    ],
+    "Le Passage Enchanté d'Aladdin": [
+        { maxTime: 5, className: 'time-gold' },
+        { maxTime: 10, className: 'time-green' },
+        { maxTime: Infinity, className: 'time-orange' } 
     ],
 
     // FANTASYLAND
     "Peter Pan's Flight": [
-        { maxTime: 20, className: 'time-gold' },    
-        { maxTime: 45, className: 'time-green' },   
-        { maxTime: 60, className: 'time-orange' }, 
+        { maxTime: 30, className: 'time-gold' },    
+        { maxTime: 60, className: 'time-green' },   
+        { maxTime: 70, className: 'time-orange' }, 
         { maxTime: Infinity, className: 'time-red' }
     ],
-    "Princess Pavilion": [
-        { maxTime: 60, className: 'time-gold' },    // C'est un point de rencontre, les files sont très longues
-        { maxTime: 90, className: 'time-green' },   
-        { maxTime: 120, className: 'time-orange' }, 
+    "Les Voyages de Pinocchio": [
+        { maxTime: 20, className: 'time-gold' },
+        { maxTime: 30, className: 'time-green' },
+        { maxTime: 40, className: 'time-orange' },
         { maxTime: Infinity, className: 'time-red' }
-    ],
+    ],  
     "it's a small world": [
-        { maxTime: 5, className: 'time-gold' },
-        { maxTime: 15, className: 'time-green' },
-        { maxTime: Infinity, className: 'time-orange' } 
+        { maxTime: 10, className: 'time-gold' },
+        { maxTime: 20, className: 'time-green' },
+        { maxTime: 30, className: 'time-orange' },
+        { maxTime: Infinity, className: 'time-red' } 
     ],
     "Dumbo the Flying Elephant": [
         { maxTime: 15, className: 'time-gold' },
-        { maxTime: 30, className: 'time-green' },
+        { maxTime: 25, className: 'time-green' },
         { maxTime: 45, className: 'time-orange' },
+        { maxTime: Infinity, className: 'time-red' }
+    ],
+    "Mad Hatter's Tea Cups": [
+        { maxTime: 10, className: 'time-green' },
+        { maxTime: 20, className: 'time-orange' },
+        { maxTime: Infinity, className: 'time-red' }
+    ],
+    "Le Carrousel de Lancelot ": [
+        { maxTime: 5, className: 'time-gold' },
+        { maxTime: 20, className: 'time-green' },
+        { maxTime: 30, className: 'time-orange' },
+        { maxTime: Infinity, className: 'time-red' }
+    ],
+    "Le Pays des Contes de Fées, presented by Vittel": [
+        { maxTime: 10, className: 'time-gold' },
+        { maxTime: 25, className: 'time-green' },
+        { maxTime: 35, className: 'time-orange' },
+        { maxTime: Infinity, className: 'time-red' }
+    ],
+    "Blanche-Neige et les Sept Nains®": [
+        { maxTime: 15, className: 'time-gold' },
+        { maxTime: 25, className: 'time-green' },
+        { maxTime: 40, className: 'time-orange' },
+        { maxTime: Infinity, className: 'time-red' }
+    ],
+    "Casey Jr. - Le Petit Train du Cirque": [
+        { maxTime: 10, className: 'time-gold' },
+        { maxTime: 25, className: 'time-green' },
+        { maxTime: 40, className: 'time-orange' },
+        { maxTime: Infinity, className: 'time-red' }
+    ],
+    "Alice's Curious Labyrinth": [
+        { maxTime: 5, className: 'time-green' },
+        { maxTime: 15, className: 'time-orange' },
         { maxTime: Infinity, className: 'time-red' }
     ],
 
     // DISCOVERYLAND
     "Star Wars Hyperspace Mountain": [
-        { maxTime: 15, className: 'time-gold' },
+        { maxTime: 20, className: 'time-gold' },
         { maxTime: 40, className: 'time-green' },   // 30 min est Orange ou Vert selon vous. J'ai mis Vert ici.
         { maxTime: 60, className: 'time-orange' },
         { maxTime: Infinity, className: 'time-red' }
     ],
     "Buzz Lightyear Laser Blast": [
-        { maxTime: 15, className: 'time-gold' },
-        { maxTime: 35, className: 'time-green' },
+        { maxTime: 20, className: 'time-gold' },
+        { maxTime: 40, className: 'time-green' },
         { maxTime: 50, className: 'time-orange' },
         { maxTime: Infinity, className: 'time-red' }
     ],
@@ -101,6 +152,24 @@ const ATTRACTION_THRESHOLDS = {
         { maxTime: 45, className: 'time-orange' },
         { maxTime: Infinity, className: 'time-red' }
     ],
+    "Orbitron": [
+        { maxTime: 15, className: 'time-gold' },
+        { maxTime: 35, className: 'time-green' },
+        { maxTime: 40, className: 'time-orange' },
+        { maxTime: Infinity, className: 'time-red' }
+    ],
+
+    // MAIN STREET, U.S.A.
+        "Main Street Vehicles": [
+        { maxTime: 30, className: 'time-green' },
+        { maxTime: 45, className: 'time-orange' },
+        { maxTime: Infinity, className: 'time-red' }
+    ],
+    "Disneyland Railroad Main Street Station": [
+        { maxTime: 30, className: 'time-green' },
+        { maxTime: 50, className: 'time-orange' },
+        { maxTime: Infinity, className: 'time-red' }
+    ],
 
     // ====================================================================
     // 🎬 WALT DISNEY STUDIOS PARK - SEUILS SUGGERÉS
@@ -114,9 +183,9 @@ const ATTRACTION_THRESHOLDS = {
         { maxTime: Infinity, className: 'time-red' }
     ],
     "Spider-Man W.E.B. Adventure": [
-        { maxTime: 10, className: 'time-gold' },
-        { maxTime: 30, className: 'time-green' },
-        { maxTime: 50, className: 'time-orange' },
+        { maxTime: 20, className: 'time-gold' },
+        { maxTime: 45, className: 'time-green' },
+        { maxTime: 55, className: 'time-orange' },
         { maxTime: Infinity, className: 'time-red' }
     ],
     
@@ -133,31 +202,49 @@ const ATTRACTION_THRESHOLDS = {
         { maxTime: 55, className: 'time-orange' },
         { maxTime: Infinity, className: 'time-red' }
     ],
-    
-    // HOLLYWOOD BOULEVARD / PRODUCTION COURTYARD
-    "The Twilight Zone Tower of Terror": [
-        { maxTime: 10, className: 'time-gold' },
-        { maxTime: 30, className: 'time-green' },
-        { maxTime: 50, className: 'time-orange' },
-        { maxTime: Infinity, className: 'time-red' }
-    ],
-    
-    // TOON STUDIO
     "RC Racer": [
-        { maxTime: 20, className: 'time-gold' },
-        { maxTime: 40, className: 'time-green' },
-        { maxTime: 60, className: 'time-orange' },
-        { maxTime: Infinity, className: 'time-red' }
+       { maxTime: 20, className: 'time-gold' },
+       { maxTime: 40, className: 'time-green' },
+       { maxTime: 60, className: 'time-orange' },
+       { maxTime: Infinity, className: 'time-red' }
     ],
     "Toy Soldiers Parachute Drop": [
         { maxTime: 15, className: 'time-gold' },
         { maxTime: 30, className: 'time-green' },
         { maxTime: 45, className: 'time-orange' },
         { maxTime: Infinity, className: 'time-red' }
-    ]
-    
-    // N'oubliez pas d'ajouter les attractions restantes (Cars ROAD TRIP, Slinky Dog, etc.)
-    // ou elles utiliseront le seuil "DEFAULT".
+    ],
+    "Les Tapis Volants - Flying Carpets Over Agrabah®": [
+        { maxTime: 5, className: 'time-gold' },
+        { maxTime: 20, className: 'time-green' },
+        { maxTime: 30, className: 'time-orange' },
+        { maxTime: Infinity, className: 'time-red' }
+    ],
+    "Cars Quatre Roues Rallye": [
+        { maxTime: 5, className: 'time-gold' },
+        { maxTime: 15, className: 'time-green' },
+        { maxTime: 25, className: 'time-orange' },
+        { maxTime: Infinity, className: 'time-red' }
+    ],
+    "Cars ROAD TRIP": [
+        { maxTime: 10, className: 'time-gold' },
+        { maxTime: 25, className: 'time-green' },
+        { maxTime: 40, className: 'time-orange' },
+        { maxTime: Infinity, className: 'time-red' }
+    ],
+    "Slinky® Dog Zigzag Spin" : [
+        { maxTime: 10, className: 'time-gold' },
+        { maxTime: 25, className: 'time-green' },
+        { maxTime: 35, className: 'time-orange' },
+        { maxTime: Infinity, className: 'time-red' }
+    ],
+    // HOLLYWOOD BOULEVARD / PRODUCTION COURTYARD
+    "The Twilight Zone Tower of Terror": [
+        { maxTime: 15, className: 'time-gold' },
+        { maxTime: 35, className: 'time-green' },
+        { maxTime: 50, className: 'time-orange' },
+        { maxTime: Infinity, className: 'time-red' }
+    ],
 };
 
 // Fonction pour déterminer la classe CSS basée sur le temps d'attente et le nom de l'attraction

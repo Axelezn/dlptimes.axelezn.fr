@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Disneyland Park - Temps d'Attente</title>
+    <title>Rencontres & PhotoPass - Disney Planner</title>
     <link rel="manifest" href="./manifest.json">
     
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -16,16 +16,18 @@
 <body>
 
     <header class="park-header">
-        <a href="./index.html" class="back-link" title="Retour à la sélection des parcs">←</a>
-        <h1 class="park-title-dlp">Disneyland Park</h1>
+        <a href="./index.html" class="back-link" title="Retour à l'accueil">←</a>
+        <h1>Rencontres</h1>
     </header>
+
     <main>
         <div class="search-container">
-        <input type="text" id="search-input" placeholder="🔍 Rechercher une attraction..." autocomplete="off">
-    </div>
-        <section class="attraction-list" id="attractions-list">
+            <input type="text" id="search-input" placeholder="🔍 Rechercher un personnage..." autocomplete="off">
+        </div>
+
+        <section class="attraction-list" id="meet-list">
              <div class="loading-message">
-                ⌛ Chargement initial des temps d'attente...
+                ⌛ Chargement des personnages...
             </div>
         </section>
     </main>
@@ -34,8 +36,7 @@
     
     <script src="./js/favorites-manager.js"></script>
     
-    <script src="./js/timetables.js"></script> 
-    <script src="./js/app-park.js"></script>
+    <script src="./js/app-meet.js"></script>
 
 </body>
 </html>

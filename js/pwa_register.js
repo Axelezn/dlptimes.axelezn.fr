@@ -1,17 +1,20 @@
-// js/pwa_register.js (Modifié pour le bouton d'installation)
+// js/pwa_register.js (Version Nettoyée : Installation PWA uniquement)
 
-let deferredPrompt; // Variable pour stocker l'événement d'installation
+let deferredPrompt; 
 
-// 1. Intercepter l'événement qui dit : "Je suis prêt à être installé"
+// =======================================================
+// 1. Gestion de l'installation PWA (A2HS)
+// =======================================================
+
+// Capture l'événement d'installation
 window.addEventListener("beforeinstallprompt", (e) => {
-  // Empêcher la bannière par défaut de s'afficher (si elle l'aurait fait)
+  // Empêche la bannière par défaut du navigateur de s'afficher immédiatement
   e.preventDefault();
-
-  // Stocker l'événement pour qu'il puisse être déclenché plus tard par notre bouton
+  
+  // Stocker l'événement pour qu'il puisse être déclenché plus tard
   deferredPrompt = e;
 
-  // Afficher notre bouton personnalisé
-  // NOTE : Le bouton doit exister dans le HTML au moment où ce script s'exécute.
+  // Afficher notre bouton personnalisé d'installation
   const installButton = document.getElementById("installButton");
   if (installButton) {
     installButton.style.display = "block";
@@ -20,14 +23,13 @@ window.addEventListener("beforeinstallprompt", (e) => {
   console.log("Installation PWA prête et événement stocké.");
 });
 
-// 2. Gérer le clic sur le bouton
-// L'écouteur doit être configuré après que la page a chargé le bouton
+// Gérer le clic sur le bouton d'installation
 document.addEventListener("DOMContentLoaded", () => {
   const installButton = document.getElementById("installButton");
   if (installButton) {
     installButton.addEventListener("click", (e) => {
       if (deferredPrompt) {
-        // Cacher le bouton
+        // Cacher le bouton car on lance le processus
         installButton.style.display = "none";
 
         // Déclencher l'invite d'installation native du navigateur
@@ -39,6 +41,7 @@ document.addEventListener("DOMContentLoaded", () => {
             console.log("Utilisateur a accepté l'installation.");
           } else {
             console.log("Utilisateur a refusé l'installation.");
+            // Optionnel : Réafficher le bouton si refusé, selon votre stratégie UX
           }
           deferredPrompt = null;
         });
@@ -47,10 +50,12 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-// 3. Enregistrement du Service Worker
+// =======================================================
+// 2. Enregistrement du Service Worker (Simple)
+// =======================================================
+
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    // Chemin du SW vérifié
     navigator.serviceWorker
       .register("./sw.js")
       .then((reg) => {
@@ -60,4 +65,6 @@ if ("serviceWorker" in navigator) {
         console.error("Échec de l'enregistrement du Service Worker:", error);
       });
   });
+} else {
+  console.log("Service Worker non supporté par ce navigateur.");
 }

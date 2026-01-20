@@ -3,12 +3,18 @@
 :root {
     --color-primary: #00287a; /* Bleu foncé de DLP */
     --color-secondary: #ffc72c; /* Doré/Jaune (couleur d'accentuation) */
-    --color-text-light: #f4f4f4; /* Texte clair (utilisé pour le clignotement intermédiaire) */
+    --color-text-light: #f4f4f4; /* Texte clair */
     --color-text-dark: #333; /* Texte foncé */
     --color-bg-dark: #12122b; /* Fond bleu nuit */
-    --color-green: #28a745; /* Vert pour temps courts */
-    --color-red: #dc3545; /* Rouge pour fermé/temps longs */
-    --attraction-card-bg: #1f1f3e; /* Bleu légèrement plus clair pour le contraste */
+    --color-green: #28a745; /* Vert */
+    --color-red: #dc3545; /* Rouge */
+    --attraction-card-bg: #1f1f3e; /* Bleu cartes */
+    
+    /* Variables ajoutées pour compatibilité */
+    --card-bg: #1f1f3e; 
+    --radius-card: 8px;
+    --radius-btn: 20px;
+    --shadow-card: 0 2px 5px rgba(0, 0, 0, 0.5);
 }
 
 /* Base et Typographie */
@@ -27,11 +33,9 @@ body {
     border-bottom: 3px solid var(--color-secondary);
     text-align: center;
     position: relative;
-    
-    /* ⭐ MODIFICATION CLÉ : Le Header reste en haut lors du défilement ⭐ */
     position: sticky; 
-    top: 0; /* Reste collé au sommet */
-    z-index: 1000; /* Assure qu'il est au-dessus du reste du contenu */
+    top: 0; 
+    z-index: 1000; 
 }
 
 .park-header h1 {
@@ -57,11 +61,59 @@ body {
 
 main {
     padding: 15px;
-    /* Un padding top peut être nécessaire ici si le header fixe chevauche le premier élément */
-    /* Cependant, 'sticky' devrait éviter cela naturellement. */
+    max-width: 800px;
+    margin: 0 auto;
 }
 
-/* ⭐ STYLE POUR LE LOGO DE LAND ⭐ */
+/* --- BARRE DE RECHERCHE (Style Original) --- */
+.search-container {
+    margin: 0 auto 20px auto;
+    text-align: center;
+    width: 100%;
+    max-width: 600px;
+}
+
+#search-input {
+    width: 100%;
+    padding: 12px 20px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 16px;
+    border-radius: 30px;
+    border: 2px solid var(--color-secondary);
+    background-color: var(--attraction-card-bg);
+    color: var(--color-text-light);
+    outline: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    box-sizing: border-box;
+}
+
+#search-input:focus {
+    box-shadow: 0 0 15px rgba(255, 199, 44, 0.4);
+    background-color: #2a2a50;
+    transform: scale(1.02);
+}
+
+#search-input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* --- BOUTON FAVORIS --- */
+.fav-btn {
+    background: none;
+    border: none;
+    font-size: 1.5em;
+    cursor: pointer;
+    color: #888;
+    transition: transform 0.2s;
+    padding: 0 0 0 10px;
+}
+.fav-btn.active {
+    color: #ff4757;
+    transform: scale(1.1);
+}
+
+/* --- LOGO DE LAND --- */
 .land-header-container {
     display: flex;
     flex-direction: column;
@@ -85,14 +137,38 @@ main {
     margin: 0;
     text-align: center;
 }
+.land-header {
+    color: var(--color-text-secondary); 
+    font-size: 1.2rem;
+    font-weight: 700;
+    
+    /* ⭐ CORRECTION 1 : ESPACE EN DESSOUS ⭐ */
+    margin: 15px 0 25px 0; /* On augmente la marge du bas à 25px */
+    
+    text-align: center;
+    padding-left: 0;
+    border-left: none;
+    border-bottom: 2px solid rgba(255, 199, 44, 0.3);
+    display: inline-block;
+    align-self: center;
+    width: 100%;
+}
 
-/* --- Liste des Attractions (UX) --- */
+/* --- LISTE DES ATTRACTIONS --- */
 .attraction-list {
     display: flex;
     flex-direction: column;
     gap: 10px; 
     max-width: 700px;
     margin: 20px auto;
+}
+
+/* ⭐ AJOUT CRUCIAL POUR L'ESPACEMENT ⭐ */
+/* C'est ce qui manquait : le style de la div créée par le JS */
+.land-group {
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Espace entre les cartes d'attractions */
 }
 
 .attraction-card {
@@ -128,53 +204,58 @@ main {
     color: #b0b0d0; 
 }
 
+/* CONTENEUR TEMPS (STANDBY + SINGLE RIDER) */
+.wait-times-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end; 
+    gap: 5px; 
+    margin-left: 15px;
+}
+
 /* --- Temps d'Attente (Affichage des Chiffres) --- */
 .wait-time {
     font-family: 'Poppins', sans-serif; 
     font-size: 2em;
     font-weight: 700;
-    margin-left: 15px;
     padding: 8px 15px;
     border-radius: 6px;
     min-width: 70px; 
     text-align: center;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+    width: auto; 
+    min-width: 0; 
 }
 
-/* --- COULEURS DES TEMPS D'ATTENTE (avec !important) --- */
-
-/* ⭐ ANIMATION : Alternance Doré / Bleu Clair ⭐ */
+/* --- COULEURS DES TEMPS D'ATTENTE --- */
 @keyframes goldFlash {
-    0%, 100% { 
-        background-color: #ffc72c !important; 
-        color: var(--color-primary) !important;
-        transform: scale(1);
-    }
-    50% { 
-        background-color: var(--color-text-light) !important; 
-        color: var(--color-primary) !important;
-        transform: scale(1.05); 
-    }
+    0%, 100% { background-color: #ffc72c !important; color: var(--color-primary) !important; transform: scale(1); }
+    50% { background-color: var(--color-text-light) !important; color: var(--color-primary) !important; transform: scale(1.05); }
+}
+@keyframes goldFlashText {
+    0%, 100% { color: var(--color-secondary) !important; }
+    50% { color: var(--color-text-light) !important; }
+}
+@keyframes movingStripes {
+    0% { background-position: 0 0; }
+    100% { background-position: 80px 0; }
 }
 
-.time-gold {
-    background-color: #ffc72c !important; 
-    color: var(--color-primary) !important;
-    animation: goldFlash 0.7s infinite alternate ease-in-out; 
-}
+.time-gold { background-color: #ffc72c !important; color: var(--color-primary) !important; animation: goldFlash 0.7s infinite alternate ease-in-out; }
+.time-green { background-color: var(--color-green) !important; color: var(--color-text-light) !important; }
+.time-orange { background-color: #ff8c00 !important; color: var(--color-text-light) !important; }
+.time-red { background-color: var(--color-red) !important; color: var(--color-text-light) !important; }
 
-.time-green {
-    background-color: var(--color-green) !important; 
+/* STATUTS SPÉCIAUX */
+.status-opened {
+    background-color: var(--color-green) !important;
     color: var(--color-text-light) !important;
+    font-size: 0.9em !important; 
+    line-height: 1.2 !important;
+    padding: 12px 8px !important; 
 }
 
-.time-orange {
-    background-color: #ff8c00 !important; 
-    color: var(--color-text-light) !important;
-}
-
-/* Indisponible/Fermé en ROUGE avec !important */
-.time-red, .status-closed, .status-refurb {
+.status-closed, .status-refurb { 
     background-color: var(--color-red) !important; 
     color: var(--color-text-light) !important;
     font-size: 0.9em !important; 
@@ -182,43 +263,208 @@ main {
     padding: 12px 8px !important;
 }
 
+.status-down {
+    position: relative;
+    overflow: hidden;
+    background-color: var(--color-red) !important; 
+    color: var(--color-text-light) !important;
+    font-size: 0.9em !important;
+    line-height: 1.2 !important;
+    padding: 12px 8px !important;
+    font-weight: 700 !important;
+    z-index: 2; 
+}
+.status-down::before {
+    content: ''; 
+    position: absolute; top: 0; left: 0; width: 200%; height: 100%;
+    background-image: repeating-linear-gradient(-45deg, var(--color-red), var(--color-red) 30px, #000000 30px, #000000 60px);
+    background-size: 80px 80px; 
+    animation: movingStripes 2.5s linear infinite; 
+    z-index: -1;
+}
+
+.status-reservation {
+    background-color: #5bc0de !important;
+    color: var(--color-primary) !important;
+    font-size: 0.9em !important; 
+    line-height: 1.2 !important;
+    padding: 12px 8px !important;
+}
+
+.status-payant {
+    background-color: var(--color-secondary) !important;
+    color: var(--color-primary) !important;
+    font-size: 1em !important; 
+    line-height: 1.2 !important;
+    padding: 10px 8px !important;
+    font-weight: 700 !important;
+}
+
+.status-single-rider {
+    background-color: var(--color-green) !important; 
+    color: var(--color-text-light) !important;
+    font-size: 0.9em !important; 
+    line-height: 1 !important;
+    padding: 8px 10px !important;
+    font-weight: 500 !important;
+    min-width: auto !important; 
+}
+
+.status-closed-single {
+    background-color: var(--color-red) !important; 
+    color: var(--color-text-light) !important;
+    font-size: 0.9em !important; 
+    line-height: 1 !important;
+    padding: 8px 10px !important;
+    font-weight: 500 !important;
+    min-width: auto !important; 
+}
+
+/* --- STYLES PREMIER ACCESS (DPA) --- */
+.dpa-details-container {
+    margin-top: 5px;
+    padding-top: 5px;
+    border-top: 1px dashed rgba(255, 255, 255, 0.1);
+}
+.dpa-toggle-header { display: flex; align-items: center; cursor: pointer; padding: 3px 0; }
+.dpa-label { font-size: 0.9em; font-weight: 500; margin: 0; color: var(--color-secondary); line-height: 1; }
+.dpa-toggle-icon { margin-left: 8px; font-size: 0.7em; color: var(--color-secondary); transition: transform 0.2s ease-in-out; display: inline-block; line-height: 1; }
+.dpa-toggle-icon.rotated { transform: rotate(180deg); }
+.dpa-details { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 5px; }
+.dpa-info { font-family: 'Poppins', sans-serif; font-size: 0.8em; font-weight: 600; padding: 5px 8px; border-radius: 4px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3); line-height: 1; white-space: nowrap; }
+.dpa-price { background-color: var(--color-secondary) !important; color: var(--color-primary) !important; }
+.dpa-time { background-color: var(--color-primary) !important; color: var(--color-text-light) !important; border: 1px solid var(--color-secondary); }
+
+/* --- STYLES POUR LA PAGE DES SPECTACLES (shows.html) --- */
+.park-show-header {
+    font-size: 1.8em;
+    font-weight: 700;
+    color: var(--color-secondary); 
+    text-align: center;
+    margin: 30px 0 15px 0;
+    padding-bottom: 5px;
+    border-bottom: 2px solid rgba(255, 199, 44, 0.5);
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.show-card {
+    display: flex;
+    flex-direction: column; 
+    background-color: var(--attraction-card-bg); 
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+    margin-bottom: 15px; /* Un peu d'espace entre les cartes shows */
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+    transition: all 0.2s ease-in-out;
+}
+
+.show-info h3 { font-size: 1.3em; margin: 0 0 5px 0; color: var(--color-text-light); font-weight: 600; }
+.show-park-land { font-size: 0.9em; margin: 0; color: #b0b0d0; }
+.show-schedule { margin-top: 10px; padding-top: 10px; border-top: 1px dashed rgba(255, 255, 255, 0.1); }
+
+/* Compte à rebours */
+.show-countdown { text-align: center; font-size: 1.1em; font-weight: 700; margin-bottom: 10px; padding: 5px 0; border-radius: 4px; color: var(--color-text-light); }
+.countdown-value { font-size: 1.2em; margin: 0 5px; }
+.countdown-default { color: #b0b0d0; }
+.countdown-red { color: var(--color-red); }
+.countdown-orange { color: #ff8c00; }
+.countdown-green { color: var(--color-green); }
+.countdown-gold { color: var(--color-secondary); animation: goldFlashText 0.7s infinite alternate ease-in-out; }
+
+/* Horaires */
+.show-times-container { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 0; padding: 0; }
+
+.show-time-box {
+    font-family: 'Poppins', sans-serif; font-size: 1em; font-weight: 600; color: var(--color-primary); 
+    background-color: var(--color-secondary); padding: 5px 10px; border-radius: 4px; 
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3); line-height: 1; white-space: nowrap; transition: all 0.2s ease-in-out;
+}
+
+/* ⭐ AJOUT : CLASSE HORAIRES PASSÉS (Grisé) ⭐ */
+.time-past-box {
+    background-color: #e0e0e0 !important; color: #999 !important;
+    border: 1px solid #ccc; opacity: 0.6; padding: 5px 10px; border-radius: 4px;
+    font-weight: 600; text-decoration: line-through;
+    font-family: 'Poppins', sans-serif; font-size: 1em; line-height: 1; white-space: nowrap;
+}
+
+/* Classes dynamiques Show */
+.time-far-box { background-color: var(--color-text-light) !important; color: var(--color-primary) !important; font-family: 'Poppins', sans-serif; font-size: 1em; font-weight: 600; padding: 5px 10px; border-radius: 4px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3); line-height: 1; white-space: nowrap; }
+.time-gold-box { background-color: #ffc72c !important; color: var(--color-primary) !important; animation: goldFlash 0.7s infinite alternate ease-in-out; font-family: 'Poppins', sans-serif; font-size: 1em; font-weight: 600; padding: 5px 10px; border-radius: 4px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3); line-height: 1; white-space: nowrap; }
+.time-green-box { background-color: var(--color-green) !important; color: var(--color-text-light) !important; font-family: 'Poppins', sans-serif; font-size: 1em; font-weight: 600; padding: 5px 10px; border-radius: 4px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3); line-height: 1; white-space: nowrap; }
+.time-orange-box { background-color: #ff8c00 !important; color: var(--color-text-light) !important; font-family: 'Poppins', sans-serif; font-size: 1em; font-weight: 600; padding: 5px 10px; border-radius: 4px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3); line-height: 1; white-space: nowrap; }
+.time-red-box { background-color: var(--color-red) !important; color: var(--color-text-light) !important; font-family: 'Poppins', sans-serif; font-size: 1em; font-weight: 600; padding: 5px 10px; border-radius: 4px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3); line-height: 1; white-space: nowrap; }
+
+.show-card.show-status-closed { opacity: 0.6; }
+.show-card .status-closed { font-size: 1em; color: var(--color-red) !important; font-weight: 600; }
 
 /* ============================== */
 /* ⭐ MEDIA QUERIES (Responsive) ⭐ */
 /* ============================== */
 
 @media (max-width: 480px) {
-    .park-header h1 {
-        font-size: 1.6em; 
-        margin-left: 15px; 
-    }
-
-    .land-logo {
-        max-width: 120px; 
+    .park-header h1 { font-size: 1.6em; margin-left: 15px; }
+    .land-logo { max-width: 120px; }
+    .land-header { font-size: 1.1em; }
+    .attraction-card { padding: 10px; }
+    .attraction-info h3 { font-size: 1.1em; }
+    .wait-times-container { margin-left: 10px; }
+    .wait-time { font-size: 1.6em; padding: 6px 10px; min-width: 60px; }
+    
+    .status-down, .status-down::before, .status-closed, .status-refurb, .status-reservation, .status-payant, .status-opened { 
+        font-size: 0.8em !important; padding: 10px 6px !important; min-width: 60px; 
     }
     
-    .land-header {
-        font-size: 1.1em; 
+    .status-single-rider, .status-closed-single { font-size: 0.75em !important; padding: 6px 8px !important; }
+    .dpa-label { font-size: 0.8em; }
+    .dpa-info { font-size: 0.75em; padding: 4px 6px; }
+    
+    .park-show-header { font-size: 1.5em; margin-top: 20px; }
+    .show-info h3 { font-size: 1.1em; }
+    
+    /* Ajout du past-box au responsive */
+    .show-time-box, .time-gold-box, .time-green-box, .time-orange-box, .time-red-box, .time-far-box, .time-past-box {
+        font-size: 0.9em; padding: 4px 8px;
     }
+    .show-countdown { font-size: 1em; }
+}
 
-    .attraction-card {
-        padding: 10px;
-    }
+.btn-menu {
+    display: block; /* Prend toute la largeur disponible */
+    width: 100%;
+    box-sizing: border-box;
+    text-align: center;
+    background: linear-gradient(135deg, #f1c40f 0%, #f39c12 100%); /* Dégradé Doré */
+    color: #fff;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    padding: 8px 12px;
+    border-radius: 6px;
+    text-decoration: none;
+    margin-top: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border: none;
+}
 
-    .attraction-info h3 {
-        font-size: 1.1em; 
-    }
+.btn-menu:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    background: linear-gradient(135deg, #f39c12 0%, #d35400 100%);
+}
 
-    .wait-time {
-        font-size: 1.6em; 
-        padding: 6px 10px;
-        min-width: 60px; 
-        margin-left: 10px;
-    }
+.btn-menu:active {
+    transform: scale(0.98);
+}
 
-    .status-closed, .status-refurb {
-        font-size: 0.8em !important; 
-        padding: 10px 6px !important;
-        min-width: 60px; 
-    }
+/* Icône dans le bouton */
+.btn-menu::before {
+    content: "📜 "; 
+    margin-right: 5px;
 }

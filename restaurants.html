@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <title>Restaurants - Disneyland Paris</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="./css/park-styles.css">
+</head>
+<body>
+
+    <header class="park-header">
+        <a href="./index.html" class="back-link" title="Retour au menu">←</a>
+        <h1>Restaurants</h1>
+    </header>
+
+    <main>
+        <div class="search-container">
+            <input type="text" id="search-input" placeholder="🔍 Pizza, Buffet, Walt's..." autocomplete="off">
+        </div>
+
+        <section id="restaurants-list" class="attraction-list">
+            <div class="loading-message">
+                🍔 Préparation de la cuisine...
+            </div>
+        </section>
+    </main>
+
+    <script src="./js/favorites-manager.js"></script>
+    
+    <script src="./js/app-restaurant.js"></script>
+
+</body>
+</html>

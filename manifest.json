@@ -2,12 +2,14 @@
   "name": "DLP Wait Times",
   "short_name": "DLP Times",
   "start_url": "./index.html",
+  "scope": "./", 
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#00287a",
+  "description": "Temps d'attente et horaires des spectacles en direct pour Disneyland Paris.",
   "icons": [
     {
-      "src": "./imgs/icon-192.png", 
+      "src": "./imgs/icon-192.png",
       "sizes": "192x192",
       "type": "image/png"
     },

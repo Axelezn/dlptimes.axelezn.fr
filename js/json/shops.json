@@ -1,0 +1,362 @@
+[
+    {
+        "id": "101",
+        "name": "Emporium",
+        "type": "SHOP",
+        "lat": 48.8712885,
+        "lon": 2.7783550,
+        "parkId": "dae968d5-630d-4719-8b06-3d107e944401",
+        "status": "OUVERT"
+    },
+    {
+        "id": "102",
+        "name": "Disney & Co.",
+        "type": "SHOP",
+        "lat": 48.8718566,
+        "lon": 2.7775909,
+        "parkId": "dae968d5-630d-4719-8b06-3d107e944401",
+        "status": "OUVERT"
+    },
+    {
+        "id": "103",
+        "name": "Harrington's Fine China & Porcelains",
+        "type": "SHOP",
+        "lat": 48.8719196,
+        "lon": 2.7778616,
+        "parkId": "dae968d5-630d-4719-8b06-3d107e944401",
+        "status": "OUVERT"
+    },
+    {
+        "id": "104",
+        "name": "Boardwalk Candy Palace, parrainé par M&M'S",
+        "type": "SHOP",
+        "lat": 48.8715000,
+        "lon": 2.7784321,
+        "parkId": "dae968d5-630d-4719-8b06-3d107e944401",
+        "status": "OUVERT"
+    },
+    {
+        "id": "105",
+        "name": "Ribbons and Bows Hat Shop",
+        "type": "SHOP",
+        "lat": 48.8716827,
+        "lon": 2.7779879,
+        "parkId": "dae968d5-630d-4719-8b06-3d107e944401",
+        "status": "OUVERT"
+    },
+    {
+        "id": "106",
+        "name": "Thunder Mesa Mercantile Building",
+        "type": "SHOP",
+        "lat": 48.8717035,
+        "lon": 2.7759615,
+        "parkId": "dae968d5-630d-4719-8b06-3d107e944401",
+        "status": "OUVERT"
+    },
+    {
+        "id": "107",
+        "name": "Pueblo Trading Post",
+        "type": "SHOP",
+        "lat": 48.8705981,
+        "lon": 2.7739532,
+        "parkId": "dae968d5-630d-4719-8b06-3d107e944401",
+        "status": "OUVERT"
+    },
+    {
+        "id": "108",
+        "name": "Indiana Jones Adventure Outpost",
+        "type": "SHOP",
+        "lat": 48.873200,
+        "lon": 2.777000,
+        "parkId": "dae968d5-630d-4719-8b06-3d107e944401",
+        "status": "OUVERT"
+    },
+    {
+        "id": "109",
+        "name": "La Girafe Curieuse",
+        "type": "SHOP",
+        "lat": 48.8718010,
+        "lon": 2.7739766,
+        "parkId": "dae968d5-630d-4719-8b06-3d107e944401",
+        "status": "OUVERT"
+    },
+    {
+        "id": "110",
+        "name": "Le Coffre du Capitaine",
+        "type": "SHOP",
+        "lat": 48.8734245,
+        "lon": 2.7729565,
+        "parkId": "dae968d5-630d-4719-8b06-3d107e944401",
+        "status": "OUVERT"
+    },
+    {
+        "id": "111",
+        "name": "La boutique du château",
+        "type": "SHOP",
+        "lat": 48.8733022,
+        "lon": 2.7760373,
+        "parkId": "dae968d5-630d-4719-8b06-3d107e944401",
+        "status": "OUVERT"
+    },
+    {
+        "id": "112",
+        "name": "Sir Mickey's Boutique",
+        "type": "SHOP",
+        "lat": 48.8739569,
+        "lon": 2.7755068,
+        "parkId": "dae968d5-630d-4719-8b06-3d107e944401",
+        "status": "OUVERT"
+    },
+    {
+        "id": "113",
+        "name": "La chaumière des Sept Nains",
+        "type": "SHOP",
+        "lat": 48.8733374,
+        "lon": 2.7756328,
+        "parkId": "dae968d5-630d-4719-8b06-3d107e944401",
+        "status": "OUVERT"
+    },
+    {
+        "id": "114",
+        "name": "Merlin l'Enchanteur",
+        "type": "SHOP",
+        "lat": 48.8731380,
+        "lon": 2.7760477,
+        "parkId": "dae968d5-630d-4719-8b06-3d107e944401",
+        "status": "OUVERT"
+    },
+    {
+        "id": "115",
+        "name": "Star Traders",
+        "type": "SHOP",
+        "lat": 48.8748400,
+        "lon": 2.7790070,
+        "parkId": "dae968d5-630d-4719-8b06-3d107e944401",
+        "status": "OUVERT"
+    },
+    {
+        "id": "116",
+        "name": "Constellations",
+        "type": "SHOP",
+        "lat": 48.8732436,
+        "lon": 2.7776752,
+        "parkId": "dae968d5-630d-4719-8b06-3d107e944401",
+        "status": "OUVERT"
+    },
+    {
+        "id": "117",
+        "name": "The Storybook Store",
+        "type": "SHOP",
+        "lat": 48.8710204,
+        "lon": 2.7782125,
+        "parkId": "dae968d5-630d-4719-8b06-3d107e944401",
+        "status": "OUVERT"
+    },
+    {
+        "id": "118",
+        "name": "La Bottega di Geppetto",
+        "type": "SHOP",
+        "lat": 48.8735921,
+        "lon": 2.7748519,
+        "parkId": "dae968d5-630d-4719-8b06-3d107e944401",
+        "status": "OUVERT"
+    },
+    {
+        "id": "119",
+        "name": "La confiserie des trois fées",
+        "type": "SHOP",
+        "lat": 48.8734452,
+        "lon": 2.7759466,
+        "parkId": "dae968d5-630d-4719-8b06-3d107e944401",
+        "status": "OUVERT"
+    },
+    {
+        "id": "120",
+        "name": "Les Trésors de Schéhérazade",
+        "type": "SHOP",
+        "lat": 48.8726092,
+        "lon": 2.7749830,
+        "parkId": "dae968d5-630d-4719-8b06-3d107e944401",
+        "status": "OUVERT"
+    },
+    {
+        "id": "121",
+        "name": "Temple Traders Boutique",
+        "type": "SHOP",
+        "lat": 48.8723999,
+        "lon": 2.7724200,
+        "parkId": "dae968d5-630d-4719-8b06-3d107e944401",
+        "status": "OUVERT"
+    },
+    {
+        "id": "122",
+        "name": "Lilly's Boutique",
+        "type": "SHOP",
+        "lat": 48.8717826,
+        "lon": 2.7777086,
+        "parkId": "dae968d5-630d-4719-8b06-3d107e944401",
+        "status": "OUVERT"
+    },
+    {
+        "id": "123",
+        "name": "Disney Clothiers",
+        "type": "SHOP",
+        "lat": 48.8715582,
+        "lon": 2.7782606,
+        "parkId": "dae968d5-630d-4719-8b06-3d107e944401",
+        "status": "OUVERT"
+    },
+    {
+        "id": "124",
+        "name": "New Century Notions Flora's Unique Boutique",
+        "type": "SHOP",
+        "lat": 48.8714086,
+        "lon": 2.7785406,
+        "parkId": "dae968d5-630d-4719-8b06-3d107e944401",
+        "status": "OUVERT"
+    },
+    {
+        "id": "125",
+        "name": "Main Street Motors",
+        "type": "SHOP",
+        "lat": 48.8716994,
+        "lon": 2.7781548,
+        "parkId": "dae968d5-630d-4719-8b06-3d107e944401",
+        "status": "OUVERT"
+    },
+    {
+        "id": "126",
+        "name": "Plaza East Boutique",
+        "type": "SHOP",
+        "lat": 48.8707578,
+        "lon": 2.7797263,
+        "parkId": "dae968d5-630d-4719-8b06-3d107e944401",
+        "status": "OUVERT"
+    },
+    {
+        "id": "127",
+        "name": "Dapper Dan's Hair Cuts",
+        "type": "SHOP",
+        "lat": 48.8715088,
+        "lon": 2.7776782,
+        "parkId": "dae968d5-630d-4719-8b06-3d107e944401",
+        "status": "OUVERT"
+    },
+    {
+        "id": "201",
+        "name": "Animation Boutique",
+        "type": "SHOP",
+        "lat": 48.8674281,
+        "lon": 2.7784792,
+        "parkId": "47f90d0c-a90f-4318-8094-1a938c40751a",
+        "status": "OUVERT"
+    },
+    {
+        "id": "202",
+        "name": "Chez Marianne",
+        "type": "SHOP",
+        "lat": 48.8675095,
+        "lon": 2.7767523,
+        "parkId": "47f90d0c-a90f-4318-8094-1a938c40751a",
+        "status": "OUVERT"
+    },
+    {
+        "id": "203",
+        "name": "Hollywood Jewel Box",
+        "type": "SHOP",
+        "lat": 48.8681142,
+        "lon": 2.7793536,
+        "parkId": "47f90d0c-a90f-4318-8094-1a938c40751a",
+        "status": "OUVERT"
+    },
+    {
+        "id": "205",
+        "name": "Mission Equipment",
+        "type": "SHOP",
+        "lat": 48.8657138,
+        "lon": 2.7791801,
+        "parkId": "47f90d0c-a90f-4318-8094-1a938c40751a",
+        "status": "OUVERT"
+    },
+    {
+        "id": "207",
+        "name": "Tower Hotel Gifts",
+        "type": "SHOP",
+        "lat": 48.8664895,
+        "lon": 2.7789976,
+        "parkId": "47f90d0c-a90f-4318-8094-1a938c40751a",
+        "status": "OUVERT"
+    },
+    {
+        "id": "208",
+        "name": "Toy Story Playland Boutique",
+        "type": "SHOP",
+        "lat": 48.86720,
+        "lon": 2.77665,
+        "parkId": "47f90d0c-a90f-4318-8094-1a938c40751a",
+        "status": "OUVERT"
+    },
+    {
+        "id": "209",
+        "name": "Walt Disney Studios Store",
+        "type": "SHOP",
+        "lat": 48.8671201,
+        "lon": 2.7761954,
+        "parkId": "47f90d0c-a90f-4318-8094-1a938c40751a",
+        "status": "OUVERT"
+    },
+    {
+        "id": "301",
+        "name": "Disney Glamour",
+        "type": "SHOP",
+        "lat": 48.8693709,
+        "lon": 2.7851356,
+        "parkId": "111b1574-848e-4a6c-a492-f018e6a1df8a",
+        "status": "OUVERT"
+    },
+    {
+        "id": "302",
+        "name": "Disney Store",
+        "type": "SHOP",
+        "lat": 48.8694900,
+        "lon": 2.7843391,
+        "parkId": "111b1574-848e-4a6c-a492-f018e6a1df8a",
+        "status": "OUVERT"
+    },
+    {
+        "id": "303",
+        "name": "Disney Style",
+        "type": "SHOP",
+        "lat": 48.8693061,
+        "lon": 2.7853265,
+        "parkId": "111b1574-848e-4a6c-a492-f018e6a1df8a",
+        "status": "OUVERT"
+    },
+    {
+        "id": "304",
+        "name": "The LEGO Store",
+        "type": "SHOP",
+        "lat": 48.8693584,
+        "lon": 2.7856012,
+        "parkId": "111b1574-848e-4a6c-a492-f018e6a1df8a",
+        "status": "OUVERT"
+    },
+    {
+        "id": "305",
+        "name": "World of Disney",
+        "type": "SHOP",
+        "lat": 48.8688320,
+        "lon": 2.7822661,
+        "parkId": "111b1574-848e-4a6c-a492-f018e6a1df8a",
+        "status": "OUVERT"
+    },
+    {
+        "id": "306",
+        "name": "Deco by Disney",
+        "type": "SHOP",
+        "lat": 48.8692466,
+        "lon": 2.7857581,
+        "parkId": "111b1574-848e-4a6c-a492-f018e6a1df8a",
+        "status": "OUVERT"
+    }
+]

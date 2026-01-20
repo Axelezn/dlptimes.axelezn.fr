@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mes Favoris - DLP Times</title>
+    <link rel="manifest" href="./manifest.json">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./css/park-styles.css">
+    <link rel="stylesheet" href="./css/index.css"> <link rel="icon" href="./imgs/icon-192.png">
+    <meta name="mobile-web-app-capable" content="yes">
+    
+    <style>
+        .fav-empty-message {
+            text-align: center;
+            margin-top: 50px;
+            color: #b0b0d0;
+        }
+        /* Style du bouton coeur sur les cartes */
+        .fav-btn {
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            cursor: pointer;
+            color: #ccc;
+            transition: color 0.2s, transform 0.2s;
+            padding: 0 10px;
+        }
+        .fav-btn.active {
+            color: #ff4757; /* Rouge coeur */
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body>
+
+    <header class="park-header">
+        <a href="./index.html" class="back-link" title="Retour">←</a>
+        <h1>Mes Favoris ❤️</h1> 
+    </header>
+
+    <main>
+        <section class="attraction-list" id="favorites-list"> 
+            <div class="loading-message">
+                ⌛ Chargement de vos favoris...
+            </div>
+        </section>
+    </main>
+    
+    <script src="./js/favorites-manager.js"></script>
+    <script src="./js/timetables.js"></script> 
+    <script src="./js/app-favorites.js"></script> 
+    <script src="./js/pwa_register.js"></script>
+
+</body>
+</html>
