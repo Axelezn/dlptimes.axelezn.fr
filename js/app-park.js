@@ -1,4 +1,4 @@
-// js/app-park.js - V20 (UX Mobile : Close Keyboard on Scroll/Enter)
+// js/app-park.js - V21 (Fix Recherche : Espacement des tuiles restauré)
 
 const CONFIG = {
     DESTINATION_ID: 'e8d0207f-da8a-4048-bec8-117aa946b2c2',
@@ -124,7 +124,7 @@ const setupListeners = () => {
     });
 };
 
-// ⭐ NOUVELLE GESTION RECHERCHE (UX MOBILE) ⭐
+// ⭐ RECHERCHE CORRIGÉE : FLEX + COLUMN (POUR LE GAP) ⭐
 const setupSearch = () => {
     const searchInput = document.getElementById('search-input');
     if (!searchInput) return;
@@ -135,13 +135,23 @@ const setupSearch = () => {
         document.querySelectorAll('.land-group').forEach(group => {
             const cards = group.querySelectorAll('.attraction-card');
             let hasVisible = false;
+            
             cards.forEach(card => {
                 const title = card.querySelector('h3').innerText.toLowerCase();
                 const match = title.includes(term);
+                // On utilise Flex ici aussi pour la carte elle-même
                 card.style.display = match ? 'flex' : 'none';
                 if (match) hasVisible = true;
             });
-            group.style.display = hasVisible ? 'block' : 'none';
+            
+            // 🛑 C'EST ICI QUE ÇA SE JOUE :
+            // On remet 'flex' (pas 'block') pour que le CSS "gap: 15px" fonctionne !
+            group.style.display = hasVisible ? 'flex' : 'none';
+            
+            // Et on s'assure que c'est bien vertical
+            if(hasVisible) {
+                group.style.flexDirection = 'column';
+            }
         });
     });
 

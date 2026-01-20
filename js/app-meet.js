@@ -1,4 +1,4 @@
-// js/app-meet.js - V27 (Fix Recherche: Utilisation de display:block pour éviter le rétrécissement)
+// js/app-meet.js - V28 (Suppression du bouton Favoris)
 
 { // 🛡️ Bloc d'isolation
 
@@ -26,7 +26,7 @@
         "and Friends": "et ses amis",
         "near": "près de",
         "at": "à",
-        "Princess Pavilion": "Pavillon des Princesses",
+        "Princess Pavilion: A Royal Invitation": "Pavillon des Princesses",
         "Hero Training Center": "Hero Training Center",
         "Town Square": "Town Square",
         "Boarding House": "Boarding House",
@@ -54,8 +54,15 @@
         "Aladdin": "Aladdin",
         "Jack Skellington": "Jack Skellington",
         "Darth Vader": "Dark Vador",
-        "Magic Shot": "Magic Shot",
-        "Photo Location": "Point Photo"
+        "a Character from The Lion King":"un personnage du Roi Lion",
+        "Encounter The Mandalorian":"Rencontrez le Mandalorian",
+        "Disney Characters":"des Personnages Disney",
+        "Starport":"Starport - Rencontrez un personnage Star Wars",
+        "the Characters of Alice in Wonderland":"un personnage d'Alice aux Pays des Merveilles",
+        "The White Rabbit":"Le Lapin Blanc",
+        "Tigger":"Tigrou",
+        "Winnie l'Ourson or friends":"Winnie l'Ourson ou ses amis",
+        'MARVEL Super Hero Heroic Encounter':"Marvel Hero Training Center"
     };
 
     // --- UTILITAIRES ---
@@ -107,16 +114,7 @@
 
     // --- GÉNÉRATION HTML ---
 
-    const createFavButton = (id) => {
-        if (typeof window.isFavorite !== 'function') return '';
-        const isActive = window.isFavorite(id);
-        const heart = isActive ? '❤️' : '🤍';
-        const activeClass = isActive ? 'active' : '';
-        return `<button class="fav-btn ${activeClass}" 
-            onclick="event.stopPropagation(); window.toggleFavorite('${id}'); this.classList.toggle('active'); this.innerText = this.classList.contains('active') ? '❤️' : '🤍';">
-            ${heart}
-        </button>`;
-    };
+    // ❌ Fonction createFavButton supprimée
 
     const createMeetCard = (char) => {
         const hasSchedules = char.schedules && char.schedules.length > 0;
@@ -165,7 +163,7 @@
                     </div>
                     <div style="width: 1px; background-color: rgba(255,255,255,0.1); height: 40px;"></div>
                     <div style="display:flex; flex-direction:column; align-items:center; min-width: 60px;">
-                        <span style="font-size:0.75em; color:#bbb; margin-bottom:4px; text-transform:uppercase; letter-spacing:1px;">Aprèm</span>
+                        <span style="font-size:0.75em; color:#bbb; margin-bottom:4px; text-transform:uppercase; letter-spacing:1px;">Après-midi</span>
                         <span class="show-time-box status-reservation" style="font-size: 1.1em; padding: 8px 12px;">14:00</span>
                     </div>
                 </div>
@@ -207,10 +205,7 @@
         return `
             <div class="show-card" id="meet-${char.id}">
                 <div class="show-info">
-                    <div style="display:flex; justify-content:space-between; align-items:start; padding-right:5px;">
-                        <h3 style="margin:0;">${nameFR}</h3>
-                        ${createFavButton(char.id)}
-                    </div>
+                    <h3 style="margin:0 0 5px 0;">${nameFR}</h3>
                     <p class="show-park-land">📍 ${regionFR}</p>
                 </div>
 
@@ -291,12 +286,7 @@
                     landGroup.appendChild(landHeader);
 
                     const sortedChars = lands[landName].sort((a, b) => {
-                        if (typeof window.isFavorite === 'function') {
-                            const favA = window.isFavorite(a.id);
-                            const favB = window.isFavorite(b.id);
-                            if (favA !== favB) return favB - favA;
-                        }
-                        return a.name.localeCompare(b.name);
+                        return a.name.localeCompare(b.name); // Tri simple par nom
                     });
                     sortedChars.forEach(char => {
                         landGroup.innerHTML += createMeetCard(char);
@@ -335,10 +325,6 @@
                     if(match) hasVisible = true;
                 });
                 
-                // ⭐ LA CORRECTION MAJEURE EST ICI ⭐
-                // On utilise 'block' pour le conteneur. Cela permet aux enfants (les cartes)
-                // de prendre toute la largeur définie par leur CSS (width: 100% / max-width: 700px)
-                // au lieu de rétrécir comme des items Flex.
                 group.style.display = hasVisible ? 'block' : 'none'; 
                 
                 const header = group.querySelector('.land-header');

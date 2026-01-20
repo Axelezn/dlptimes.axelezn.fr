@@ -1,4 +1,4 @@
-// js/app-studios.js - V20 (UX Mobile : Close Keyboard on Scroll/Enter)
+// js/app-studios.js - V21 (Fix Recherche : Espacement des tuiles restauré)
 
 // ⭐ CONSTANTES
 const CONFIG = {
@@ -116,7 +116,7 @@ const setupDpaListeners = () => {
     });
 };
 
-// ⭐ NOUVELLE GESTION RECHERCHE (UX MOBILE) ⭐
+// ⭐ RECHERCHE CORRIGÉE : FLEX + COLUMN (POUR LE GAP) ⭐
 const setupSearch = () => {
     const searchInput = document.getElementById('search-input');
     if (!searchInput) return;
@@ -131,27 +131,34 @@ const setupSearch = () => {
             cards.forEach(card => {
                 const title = card.querySelector('h3').innerText.toLowerCase();
                 const isMatch = title.includes(term);
+                // On utilise Flex ici aussi pour la carte elle-même
                 card.style.display = isMatch ? 'flex' : 'none';
                 if (isMatch) hasVisibleCards = true;
             });
-            // Cache le land entier si aucune attraction ne matche
-            group.style.display = hasVisibleCards ? 'block' : 'none';
+            
+            // 🛑 C'EST ICI QUE ÇA SE JOUE :
+            // On remet 'flex' (pas 'block') pour que le CSS "gap: 15px" fonctionne !
+            group.style.display = hasVisibleCards ? 'flex' : 'none';
+            
+            // Et on s'assure que c'est bien vertical
+            if(hasVisibleCards) {
+                group.style.flexDirection = 'column';
+            }
         });
     });
 
     // 2. Touche "Entrée" -> Ferme le clavier (Blur)
     searchInput.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
-            e.preventDefault(); // Empêche le submit si form
-            searchInput.blur(); // 🛑 Ferme le clavier
+            e.preventDefault(); 
+            searchInput.blur(); 
         }
     });
 
     // 3. Scroll de la page -> Ferme le clavier
     window.addEventListener('scroll', () => {
-        // Si l'utilisateur scrolle alors que le champ est focus
         if (document.activeElement === searchInput) {
-            searchInput.blur(); // 🛑 Ferme le clavier pour voir les résultats
+            searchInput.blur(); 
         }
     }, { passive: true });
 };
@@ -219,5 +226,5 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchAttractionTimes();
     setInterval(fetchAttractionTimes, CONFIG.REFRESH_INTERVAL);
     setupDpaListeners();
-    setupSearch(); // ⭐ Init Recherche
+    setupSearch(); 
 });
