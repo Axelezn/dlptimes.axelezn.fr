@@ -1,450 +1,612 @@
-// js/app-map.js - V27 (Refactoring ES6+ & Optimisation)
+// js/app-map.js - V28 (Bouton Menu : Navigation dans le même onglet)
 
-// ⭐ CONFIGURATION
-const CONFIG = {
-    DESTINATION_ID: 'e8d0207f-da8a-4048-bec8-117aa946b2c2',
-    API_URL: 'https://api.themeparks.wiki/v1/entity/e8d0207f-da8a-4048-bec8-117aa946b2c2/live',
-    URLS: {
-        COORDS: './js/json/dlp-coords.json',
-        SHOPS: './js/json/shops.json',
-        DINING: './js/json/restaurants.json',
-        MEETS: './js/json/meets.json'
-    },
-    REFRESH_INTERVAL: 60000,
-    MAP_CENTER: [48.8694922, 2.7804949],
-    INITIAL_ZOOM: 16,
-    FILTER_TYPES: ['ALL', 'ATTRACTION', 'SHOW', 'MEET', 'SHOP', 'RESTAURANT']
-};
+// ⭐ CONSTANTES D'IDENTIFICATION & DE L'API
+const DESTINATION_ID = "e8d0207f-da8a-4048-bec8-117aa946b2c2";
+const API_URL = `https://api.themeparks.wiki/v1/entity/${DESTINATION_ID}/live`;
+const COORDS_JSON_URL = "./js/json/dlp-coords.json";
+const SHOPS_JSON_URL = "./js/json/shops.json";
+const DINING_JSON_URL = "./js/json/restaurants.json";
+const MEETS_JSON_URL = "./js/json/meets.json";
+const REFRESH_INTERVAL = 60000;
+
+// ⭐ COORDONNÉES ET VUE INITIALE
+const DLP_CENTER_LAT = 48.8694922;
+const DLP_CENTER_LON = 2.7804949;
+const INITIAL_ZOOM = 16;
+
+// ⭐ FILTRAGE
+const FILTER_TYPES_FULL = [
+  "ALL",
+  "ATTRACTION",
+  "SHOW",
+  "MEET",
+  "SHOP",
+  "RESTAURANT",
+];
+let activeFilters = new Set(["ATTRACTION"]);
 
 let map;
 let markersLayer;
 let allStaticCoordinates = [];
-let activeFilters = new Set(['ATTRACTION']); // Filtre initial
 
-// --- UTILITAIRES ---
+// --- FONCTIONS UTILITAIRES SPECTACLES ---
+function getNextShowInfo(entity) {
+  const allScheduleData =
+    entity.showtimes || entity.schedule?.schedule || entity.horaires || [];
+  const now = new Date();
 
-/**
- * Récupère les infos du prochain show/meet.
- */
-const getNextShowInfo = (entity) => {
-    const allScheduleData = entity.showtimes || entity.schedule?.schedule || entity.horaires || [];
-    const now = new Date();
-
-    const futureScheduleData = allScheduleData
-        .map(item => {
-            const timeString = item.startTime || item.endTime || item;
-            let dateObj = new Date();
-
-            // Gestion HH:MM vs Date complète
-            if (typeof timeString === 'string' && timeString.match(/^\d{2}:\d{2}$/)) {
-                const [hours, minutes] = timeString.split(':').map(Number);
-                dateObj.setHours(hours, minutes, 0, 0);
-            } else {
-                dateObj = new Date(timeString); // Clone si déjà date ou parse string
-            }
-            return { raw: timeString, date: dateObj };
-        })
-        .filter(item => item.date > now)
-        .sort((a, b) => a.date - b.date);
-
-    if (!futureScheduleData.length) return { time: null, minutes: Infinity, isLive: false };
-
-    const nextItem = futureScheduleData[0];
-    const formattedTime = nextItem.date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
-    const diffInMinutes = Math.floor((nextItem.date - now) / 60000);
-    const isLive = diffInMinutes <= 5 && diffInMinutes >= -10;
-
-    return { time: formattedTime, minutes: diffInMinutes, isLive };
-};
-
-/**
- * Détermine la couleur en fonction du statut ou de l'attente.
- */
-const getStatusColor = (entity) => {
-    const { status, entityType, type = entityType, queue } = entity;
-
-    // Statuts prioritaires
-    if (['CLOSED', 'DOWN'].includes(status)) return '#dc3545';
-    if (['REFURBISHMENT', 'UPCOMING'].includes(status)) return '#ffc107';
-    if (status === 'UNKNOWN') return '#0d6fdc';
-
-    // Shows & Meets
-    if (['SHOW', 'MEET'].includes(type) && status === 'OPERATING') {
-        const { minutes, isLive } = getNextShowInfo(entity);
-        if (minutes === Infinity) return '#dc3545';
-        if (isLive) return '#ffc107';
-        if (minutes < 15) return '#fd7e14';
-        if (minutes < 30) return '#ffc107';
-        return minutes < 60 ? '#28a745' : '#198754';
-    }
-
-    // Attractions
-    if (type === 'ATTRACTION' && status === 'OPERATING') {
-        const waitTime = queue?.STANDBY?.waitTime;
-        if (typeof waitTime === 'number') {
-            if (waitTime === 0) return '#198754';
-            if (waitTime <= 20) return '#28a745';
-            if (waitTime <= 45) return '#ffc107';
-            if (waitTime <= 75) return '#fd7e14';
-            return '#dc3545';
-        }
-    }
-
-    return '#198754'; // Par défaut (Shops, Resto ouverts)
-};
-
-/**
- * Crée l'icône Leaflet.
- */
-const createCustomIcon = (entity) => {
-    const color = getStatusColor(entity);
-    const type = entity.entityType || entity.type;
-    
-    const icons = {
-        SHOW: 'fas fa-mask',
-        RESTAURANT: 'fas fa-utensils',
-        DINING: 'fas fa-utensils',
-        SHOP: 'fas fa-shopping-bag',
-        MEET: 'fas fa-star',
-        ATTRACTION: 'fas fa-map-marker-alt'
-    };
-
-    const iconClass = icons[type] || icons.ATTRACTION;
-
-    return L.divIcon({
-        html: `<div style="color: ${color}; font-size: 24px;"><i class="${iconClass}"></i></div>`,
-        className: 'custom-map-icon',
-        iconSize: [24, 24],
-        iconAnchor: [12, 24],
-        popupAnchor: [0, -20]
+  const futureScheduleData = allScheduleData
+    .filter((item) => {
+      const timeString = item.startTime || item.endTime || item;
+      let showTimeDate = new Date();
+      if (typeof timeString === "string" && timeString.match(/^\d{2}:\d{2}$/)) {
+        const [hours, minutes] = timeString.split(":").map(Number);
+        showTimeDate.setHours(hours, minutes, 0, 0);
+      } else if (typeof timeString === "string") {
+        showTimeDate.setTime(new Date(timeString).getTime());
+      } else {
+        return false;
+      }
+      return showTimeDate > now;
+    })
+    .sort((a, b) => {
+      const timeA = a.startTime || a.endTime || a;
+      const timeB = b.startTime || b.endTime || b;
+      if (timeA.match(/^\d{2}:\d{2}$/)) {
+        const [hA, mA] = timeA.split(":").map(Number);
+        const [hB, mB] = timeB.split(":").map(Number);
+        return hA * 60 + mA - (hB * 60 + mB);
+      }
+      return new Date(timeA) - new Date(timeB);
     });
-};
 
-// --- TEXTES ET POPUPS ---
+  if (futureScheduleData.length === 0)
+    return { time: null, minutes: Infinity, isLive: false };
 
-const getWaitTimeText = (entity) => {
-    const { status, entityType, type = entityType, queue, reservationParc, fileAttenteVirtuelle, features } = entity;
+  const nextTimeItem = futureScheduleData[0];
+  const nextTime =
+    nextTimeItem.startTime || nextTimeItem.endTime || nextTimeItem;
+  let nextTimeDate = new Date();
 
-    if (['SHOP', 'RESTAURANT', 'DINING'].includes(type)) return null;
-    if (status === 'UPCOMING') return 'BIENTÔT';
-    if (['REFURBISHMENT'].includes(status)) return 'RÉNO';
-    if (['CLOSED', 'DOWN'].includes(status)) return 'FERMÉ';
+  if (typeof nextTime === "string" && nextTime.match(/^\d{2}:\d{2}$/)) {
+    const [hours, minutes] = nextTime.split(":").map(Number);
+    nextTimeDate.setHours(hours, minutes, 0, 0);
+  } else {
+    nextTimeDate.setTime(new Date(nextTime).getTime());
+  }
 
-    if (type === 'ATTRACTION' && status === 'OPERATING') {
-        const standby = queue?.STANDBY?.waitTime;
-        if (typeof standby === 'number') return standby > 0 ? `${standby} min` : '0 min';
-        
-        const paid = queue?.PAID_RETURN_TIME;
-        if (paid?.state === 'AVAILABLE') return `PA ${paid.price.amount / 100}€`;
-        
-        return null;
+  const formattedTime = nextTimeDate.toLocaleTimeString("fr-FR", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+  const diffInMinutes = Math.floor(
+    (nextTimeDate.getTime() - now.getTime()) / 60000
+  );
+  const isLive = diffInMinutes <= 5 && diffInMinutes >= -10;
+
+  return { time: formattedTime, minutes: diffInMinutes, isLive: isLive };
+}
+
+function getShowUrgencyColor(diffInMinutes, isLive) {
+  if (isLive) return "#ffc107";
+  if (diffInMinutes < 15) return "#fd7e14";
+  if (diffInMinutes < 30) return "#ffc107";
+  if (diffInMinutes < 60) return "#28a745";
+  return "#198754";
+}
+
+// --- LOGIQUE DES COULEURS (MARQUEURS) ---
+function getStatusColor(entity) {
+  const status = entity.status;
+
+  if (entity.entityType === "RESTAURANT") {
+    if (status === "FERME" || status === "CLOSED") return "#dc3545";
+    return "#28a745";
+  }
+
+  switch (status) {
+    case "CLOSED":
+    case "DOWN":
+    case "FERME":
+      return "#dc3545";
+    case "REFURBISHMENT":
+      return "#ffc107";
+    case "UNKNOWN":
+      return "#0d6fdc";
+  }
+
+  if (
+    (entity.entityType === "SHOW" || entity.entityType === "MEET") &&
+    status === "OPERATING"
+  ) {
+    const info = getNextShowInfo(entity);
+    if (info.minutes === Infinity) return "#dc3545";
+    return getShowUrgencyColor(info.minutes, info.isLive);
+  }
+
+  if (entity.entityType === "ATTRACTION" && status === "OPERATING") {
+    const standbyQueue = entity.queue?.STANDBY;
+    if (standbyQueue && typeof standbyQueue.waitTime === "number") {
+      const waitTime = standbyQueue.waitTime;
+      if (waitTime === 0) return "#198754";
+      if (waitTime <= 20) return "#28a745";
+      if (waitTime <= 45) return "#ffc107";
+      if (waitTime <= 75) return "#fd7e14";
+      return "#dc3545";
     }
+  }
+  return "#198754";
+}
 
-    if (['SHOW', 'MEET'].includes(type)) {
-        const info = getNextShowInfo(entity);
-        if (info.isLive) return 'LIVE';
-        if (info.time) return info.time;
+// --- LOGIQUE DES ICÔNES ---
+function createCustomIcon(entity) {
+  const color = getStatusColor(entity);
+  let iconClass = "fas fa-map-marker-alt";
 
-        // Gestion spécifique "Réservation" pour les Meets
-        const requiresRes = reservationParc || fileAttenteVirtuelle || features?.includes('PAID_ACCESS') || features?.includes('BOOKABLE');
-        if (type === 'MEET' && requiresRes && info.minutes === Infinity) return 'RÉSERVATION';
+  switch (entity.entityType || entity.type) {
+    case "SHOW":
+      iconClass = "fas fa-mask";
+      break;
+    case "RESTAURANT":
+    case "DINING":
+      iconClass = "fas fa-utensils";
+      break;
+    case "SHOP":
+      iconClass = "fas fa-shopping-bag";
+      break;
+    case "MEET":
+      iconClass = "fas fa-star";
+      break;
+    default:
+      iconClass = "fas fa-map-marker-alt";
+      break;
+  }
 
-        return 'AUCUN';
+  return L.divIcon({
+    html: `<div style="color: ${color}; font-size: 24px;"><i class="${iconClass}"></i></div>`,
+    className: "custom-map-icon",
+    iconSize: [24, 24],
+    iconAnchor: [12, 24],
+    popupAnchor: [0, -20],
+  });
+}
+
+// --- LOGIQUE TOOLTIP ---
+function getWaitTimeText(entity) {
+  const status = entity.status;
+  const type = entity.entityType || entity.type;
+
+  if (type === "RESTAURANT" || type === "SHOP") return null;
+
+  if (type === "ATTRACTION" && status === "OPERATING") {
+    const standbyQueue = entity.queue?.STANDBY;
+    if (
+      standbyQueue &&
+      typeof standbyQueue.waitTime === "number" &&
+      standbyQueue.waitTime > 0
+    ) {
+      return `${standbyQueue.waitTime} min`;
     }
-
+    if (
+      standbyQueue &&
+      typeof standbyQueue.waitTime === "number" &&
+      standbyQueue.waitTime === 0
+    ) {
+      return "0 min";
+    }
     return null;
-};
+  }
 
-const createPopupContent = (entity) => {
-    const { name = 'POI Inconnu', status = 'Statut Inconnu', entityType, type = entityType, queue, priceRange } = entity;
-    
-    let title = 'Détails';
-    let details = 'N/A';
-    let statusDisplay = `<span style="color: ${getStatusColor(entity)};"><strong>Statut :</strong> ${status}</span>`;
+  if (type === "SHOW" || type === "MEET") {
+    if (status === "REFURBISHMENT") return "RÉNO";
+    if (status === "CLOSED" || status === "DOWN" || status === "FERME")
+      return "FERMÉ";
 
-    if (status === 'UPCOMING') {
-        title = 'Ouverture';
-        details = 'Ouverture prochaine';
-        statusDisplay = `<span style="color: ${getStatusColor(entity)};"><strong>Statut :</strong> BIENTÔT</span>`;
-    
-    } else if (type === 'ATTRACTION' && queue) {
-        title = 'Attente';
-        const items = [];
-        
-        if (queue.STANDBY?.waitTime !== undefined) items.push(`Classique : <strong>${queue.STANDBY.waitTime} min</strong>`);
-        
-        const paid = queue.PAID_RETURN_TIME;
-        if (paid?.state === 'AVAILABLE') {
-            const time = paid.returnStart ? ` (${paid.returnStart.substring(11, 16)})` : '';
-            items.push(`Premier Access : <strong>${paid.price.formatted}${time}</strong>`);
-        } else if (paid?.state === 'SOLD_OUT') {
-            items.push(`Premier Access : <strong>Épuisé</strong>`);
-        }
-        
-        if (queue.SINGLE_RIDER?.waitTime !== undefined) items.push(`Single Rider : <strong>${queue.SINGLE_RIDER.waitTime} min</strong>`);
-        if (queue.VIRTUAL_QUEUE?.state === 'AVAILABLE') items.push(`File Virtuelle : <strong>Disponible</strong>`);
-        
-        details = items.length ? items.join('<br>') : 'N/A';
+    const info = getNextShowInfo(entity);
+    if (info.isLive) return "LIVE";
+    if (info.time) return info.time;
 
-    } else if (['SHOW', 'MEET'].includes(type) && (status === 'OPERATING' || status === 'UNKNOWN')) {
-        title = 'Horaires';
-        // Réutilisation de la logique de tri de getNextShowInfo mais pour l'affichage complet
-        const info = getNextShowInfo(entity); // Simplification: on affiche juste le prochain ici ou une liste
-        
-        // Pour afficher la liste des 5 prochains (logique complète)
-        const allData = entity.showtimes || entity.schedule?.schedule || entity.horaires || [];
-        const now = new Date();
-        const next5 = allData
-            .map(t => {
-                const ts = t.startTime || t.endTime || t;
-                if (typeof ts === 'string' && ts.match(/^\d{2}:\d{2}$/)) {
-                    const [h, m] = ts.split(':');
-                    const d = new Date(); d.setHours(h, m, 0, 0);
-                    return { str: ts, date: d };
-                }
-                return { str: new Date(ts).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}), date: new Date(ts) };
-            })
-            .filter(o => o.date > now)
-            .sort((a, b) => a.date - b.date)
-            .slice(0, 5)
-            .map(o => o.str);
+    const requiresReservation =
+      entity.reservationParc === true ||
+      entity.fileAttenteVirtuelle === true ||
+      entity.features?.includes("BOOKABLE");
+    if (type === "MEET" && requiresReservation && info.minutes === Infinity) {
+      return "RÉSERVATION";
+    }
+    if (status === "UNKNOWN" && (entity.horaires || entity.showtimes))
+      return "AUCUN";
+    return "AUCUN";
+  }
 
-        details = next5.length ? `Prochains : <strong>${next5.join(' | ')}</strong>` : 'Aucune représentation à venir.';
+  if (status === "REFURBISHMENT") return "RÉNO";
+  if (status === "CLOSED" || status === "DOWN" || status === "FERME")
+    return "FERMÉ";
 
-        // Détails spécifiques MEET
-        if (type === 'MEET') {
-            const extras = [];
-            const vq = queue?.VIRTUAL_QUEUE?.state;
-            
-            if (vq === 'AVAILABLE' || entity.fileAttenteVirtuelle) extras.push('File Virtuelle : <strong>Disponible</strong> <i class="fas fa-mobile-alt" style="color:#007bff;"></i>');
-            else if (vq === 'SOLD_OUT') extras.push('File Virtuelle : <strong>Épuisée</strong> <i class="fas fa-mobile-alt" style="color:#dc3545;"></i>');
+  return null;
+}
 
-            if (entity.disneyPhotopass || entity.features?.some(f => f.includes('PHOTO_PASS'))) extras.push('PhotoPass : <strong>Oui</strong> <i class="fas fa-camera" style="color:#198754;"></i>');
+// --- LOGIQUE POPUP (Contenu au clic) ---
+function createPopupContent(entity) {
+  const name = entity.name || entity.titre || "POI Inconnu";
+  const status = entity.status || "Statut Inconnu";
+  const type = entity.entityType || entity.type;
+  let details = "";
+  let title = "Détails";
 
-            if (entity.features?.includes('PAID_ACCESS') || entity.features?.includes('BOOKABLE')) extras.push('Réservation : <strong>Premier Access / Obligatoire</strong> <i class="fas fa-calendar-check" style="color:#ffc107;"></i>');
-            else if (entity.reservationParc) extras.push('Réservation : <strong>Obligatoire</strong> <i class="fas fa-calendar-check" style="color:#0d6fdc;"></i>');
+  // --- 1. ATTRACTIONS ---
+  if (type === "ATTRACTION" && entity.queue) {
+    title = "Attente";
+    const standby = entity.queue.STANDBY;
+    const paid = entity.queue.PAID_RETURN_TIME;
+    const singleRider = entity.queue.SINGLE_RIDER;
 
-            if (extras.length) details += `<hr style="margin:5px 0;border-color:#eee;">` + extras.join('<br>');
-        }
+    let waitDetails = [];
+    if (standby && typeof standby.waitTime === "number")
+      waitDetails.push(`Classique : <strong>${standby.waitTime} min</strong>`);
+    if (paid && paid.state === "AVAILABLE")
+      waitDetails.push(
+        `Premier Access : <strong>${
+          paid.price?.formatted || paid.price.amount / 100 + "€"
+        }</strong>`
+      );
+    if (singleRider && typeof singleRider.waitTime === "number")
+      waitDetails.push(
+        `Single Rider : <strong>${singleRider.waitTime} min</strong>`
+      );
 
-    } else if (['RESTAURANT', 'SHOP', 'DINING'].includes(type)) {
-        title = 'Disponibilité';
-        const isOpen = ['OPERATING', 'OUVERT'].includes(status);
-        details = isOpen ? 'Ouvert' : status;
-        if (priceRange) details += `<br>Prix : <strong>${priceRange}</strong>`;
+    details = waitDetails.length > 0 ? waitDetails.join("<br>") : "N/A";
+  }
+
+  // --- 2. RESTAURANTS (Mise à jour V28) ---
+  else if (type === "RESTAURANT" || type === "DINING") {
+    title = "Infos Resto";
+
+    let restoInfos = [];
+    const readableType = entity.subtype || entity.type;
+    if (readableType && readableType !== "RESTAURANT")
+      restoInfos.push(`Type : ${readableType}`);
+
+    if (entity.cuisine)
+      restoInfos.push(`Cuisine : <strong>${entity.cuisine}</strong>`);
+    if (entity.priceRange)
+      restoInfos.push(`Prix : <strong>${entity.priceRange}</strong>`);
+
+    if (entity.horaires)
+      restoInfos.push(`Horaires : <strong>${entity.horaires}</strong>`);
+    else restoInfos.push(`Horaires : Non communiqués`);
+
+    if (entity.reservation)
+      restoInfos.push(
+        `<i class="fas fa-calendar-check" style="color:#00287a;"></i> Réservation conseillée`
+      );
+    if (entity.clickAndCollect)
+      restoInfos.push(
+        `<i class="fas fa-mobile-alt" style="color:#e67e22;"></i> Click & Collect`
+      );
+
+    // ⭐ BOUTON MENU - NAVIGATION DIRECTE (Même onglet) ⭐
+    if (entity.menuUrl && entity.menuUrl.length > 5) {
+      // Suppression de target="_blank" pour rester sur la même page
+      restoInfos.push(
+        `<div style="margin-top:8px;"><a href="${entity.menuUrl}" class="btn-menu-popup" style="display:inline-block; background:linear-gradient(135deg, #f1c40f 0%, #f39c12 100%); color:#fff; padding:6px 12px; border-radius:4px; text-decoration:none; font-size:0.85em; font-weight:600;">📜 Voir le menu</a></div>`
+      );
     }
 
-    return `
+    details = restoInfos.join("<br>");
+  }
+
+  // --- 3. SHOWS & MEETS ---
+  else if (
+    (type === "SHOW" || type === "MEET") &&
+    (entity.status === "OPERATING" || status === "UNKNOWN")
+  ) {
+    title = "Horaires";
+    const info = getNextShowInfo(entity);
+
+    if (info.time) details = `Prochain : <strong>${info.time}</strong>`;
+    else details = "Aucun horaire à venir.";
+
+    if (type === "MEET") {
+      const meetDetails = [];
+      if (entity.fileAttenteVirtuelle)
+        meetDetails.push("File Virtuelle : <strong>Oui</strong>");
+      if (entity.disneyPhotopass)
+        meetDetails.push("PhotoPass : <strong>Oui</strong>");
+      if (entity.reservationParc)
+        meetDetails.push("Réservation : <strong>Oui</strong>");
+
+      if (meetDetails.length > 0) {
+        details += `<hr style="margin:5px 0;">` + meetDetails.join("<br>");
+      }
+    }
+  } else {
+    details = status === "OPERATING" || status === "OUVERT" ? "Ouvert" : status;
+  }
+
+  const color = getStatusColor(entity);
+  const statusDisplay =
+    type !== "RESTAURANT"
+      ? `<br><span style="color:${color};"><strong>Statut:</strong> ${status}</span>`
+      : "";
+
+  return `
         <div class="map-popup">
             <h4>${name}</h4>
-            <p><strong>${title}</strong><br> ${details}</p>
+            <p><strong>${title}</strong><br>${details}</p>
             ${statusDisplay}
         </div>
     `;
-};
+}
 
-// --- LOGIQUE DE FILTRE ---
+// --- FILTRES ---
 
-const toggleFilter = (type, btn) => {
-    const isAll = type === 'ALL';
-    const coreTypes = CONFIG.FILTER_TYPES.filter(t => t !== 'ALL');
+function addFilterControls() {
+  const FilterControl = L.Control.extend({
+    onAdd: function (map) {
+      const container = L.DomUtil.create(
+        "div",
+        "leaflet-bar leaflet-control leaflet-control-custom filter-controls"
+      );
+      container.id = "filter-container";
 
-    if (isAll) {
-        // Toggle ALL : soit tout activer, soit reset à ATTRACTION
-        const allActive = coreTypes.every(t => activeFilters.has(t));
-        activeFilters.clear();
-        if (!allActive) coreTypes.forEach(t => activeFilters.add(t));
-        else activeFilters.add('ATTRACTION');
-    } else {
-        // Toggle Individuel
-        if (activeFilters.has(type)) {
-            if (activeFilters.size > 1) activeFilters.delete(type);
+      const typeNames = {
+        ALL: "Tout",
+        ATTRACTION: "Attractions",
+        SHOW: "Spectacles",
+        MEET: "Meets",
+        SHOP: "Boutiques",
+        RESTAURANT: "Restaurants",
+      };
+
+      FILTER_TYPES_FULL.forEach((type) => {
+        const button = L.DomUtil.create("button", "filter-button", container);
+        button.textContent = typeNames[type];
+        button.setAttribute("data-filter-type", type);
+
+        if (type === "ALL") {
+          L.DomEvent.on(button, "click", (e) => {
+            L.DomEvent.stop(e);
+            toggleFilterAll(button);
+          });
         } else {
-            activeFilters.add(type);
+          if (activeFilters.has(type)) L.DomUtil.addClass(button, "active");
+          L.DomEvent.on(button, "click", (e) => {
+            L.DomEvent.stop(e);
+            toggleFilter(type, button);
+          });
         }
+      });
+      return container;
+    },
+  });
+  new FilterControl({ position: "topright" }).addTo(map);
+}
+
+function addMobileFilterToggle() {
+  const toggleBtn = document.getElementById("toggle-filter-btn");
+  const filterContainer = document.getElementById("filter-container");
+  if (toggleBtn && filterContainer) {
+    toggleBtn.addEventListener("click", () => {
+      filterContainer.classList.toggle("visible");
+      toggleBtn.innerHTML = filterContainer.classList.contains("visible")
+        ? "&times;"
+        : "&#x2699;";
+    });
+  }
+}
+
+function toggleFilter(type, buttonElement) {
+  const allButton = document.querySelector('[data-filter-type="ALL"]');
+  if (activeFilters.has(type)) {
+    if (activeFilters.size > 1) {
+      activeFilters.delete(type);
+      L.DomUtil.removeClass(buttonElement, "active");
+      if (allButton) L.DomUtil.removeClass(allButton, "active");
     }
-    updateFilterUI();
+  } else {
+    activeFilters.add(type);
+    L.DomUtil.addClass(buttonElement, "active");
+  }
+  loadMapData();
+  closeMobileFilterIfOpen();
+}
+
+function toggleFilterAll(buttonElement) {
+  const coreTypes = ["ATTRACTION", "SHOW", "MEET", "SHOP", "RESTAURANT"];
+  const btns = document.querySelectorAll(
+    '.filter-button[data-filter-type]:not([data-filter-type="ALL"])'
+  );
+
+  if (coreTypes.every((t) => activeFilters.has(t))) {
+    activeFilters.clear();
+    activeFilters.add("ATTRACTION");
+    L.DomUtil.removeClass(buttonElement, "active");
+    btns.forEach((b) => {
+      b.getAttribute("data-filter-type") === "ATTRACTION"
+        ? L.DomUtil.addClass(b, "active")
+        : L.DomUtil.removeClass(b, "active");
+    });
+  } else {
+    activeFilters.clear();
+    coreTypes.forEach((t) => activeFilters.add(t));
+    L.DomUtil.addClass(buttonElement, "active");
+    btns.forEach((b) => L.DomUtil.addClass(b, "active"));
+  }
+  loadMapData();
+  closeMobileFilterIfOpen();
+}
+
+function closeMobileFilterIfOpen() {
+  const filterContainer = document.getElementById("filter-container");
+  const toggleBtn = document.getElementById("toggle-filter-btn");
+  if (
+    window.innerWidth < 600 &&
+    filterContainer?.classList.contains("visible")
+  ) {
+    filterContainer.classList.remove("visible");
+    if (toggleBtn) toggleBtn.innerHTML = "&#x2699;";
+  }
+}
+
+// --- GEOLOC ---
+function addGeolocationControl() {
+  const GeolocationControl = L.Control.extend({
+    onAdd: function (map) {
+      const container = L.DomUtil.create(
+        "div",
+        "leaflet-bar leaflet-control leaflet-control-custom"
+      );
+      container.innerHTML =
+        '<a href="#" style="font-size:1.2em;"><i class="fas fa-crosshairs"></i></a>';
+      L.DomEvent.on(container, "click", (e) => {
+        L.DomEvent.stop(e);
+        map.locate({ setView: true, maxZoom: 16 });
+      });
+      return container;
+    },
+  });
+  new GeolocationControl({ position: "topleft" }).addTo(map);
+  map.on("locationfound", (e) => {
+    if (map.userMarker) map.removeLayer(map.userMarker);
+    map.userMarker = L.marker(e.latlng)
+      .addTo(map)
+      .bindPopup("Vous êtes ici")
+      .openPopup();
+  });
+}
+
+// --- INIT & CHARGEMENT ---
+
+function initializeMap() {
+  if (!document.getElementById("map")) return;
+  if (map) map.remove();
+
+  map = L.map("map").setView([DLP_CENTER_LAT, DLP_CENTER_LON], INITIAL_ZOOM);
+  L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 19,
+    attribution: "© OpenStreetMap",
+  }).addTo(map);
+
+  markersLayer = L.markerClusterGroup({
+    spiderfyOnMaxZoom: true,
+    disableClusteringAtZoom: 18,
+  });
+  map.addLayer(markersLayer);
+
+  addGeolocationControl();
+  addFilterControls();
+  addMobileFilterToggle();
+
+  loadAllStaticCoordinates().then(() => {
     loadMapData();
-    closeMobileFilter();
-};
+    setInterval(loadMapData, REFRESH_INTERVAL);
+  });
+}
 
-const updateFilterUI = () => {
-    const coreTypes = CONFIG.FILTER_TYPES.filter(t => t !== 'ALL');
-    const allActive = coreTypes.every(t => activeFilters.has(t));
-    
-    document.querySelectorAll('.filter-button').forEach(btn => {
-        const type = btn.dataset.filterType;
-        if (type === 'ALL') {
-            btn.classList.toggle('active', allActive);
-        } else {
-            btn.classList.toggle('active', activeFilters.has(type));
-        }
+async function loadAllStaticCoordinates() {
+  try {
+    const [coordsRes, shopsRes, diningRes, meetsRes] = await Promise.all([
+      fetch(COORDS_JSON_URL),
+      fetch(SHOPS_JSON_URL),
+      fetch(DINING_JSON_URL),
+      fetch(MEETS_JSON_URL),
+    ]);
+
+    const mainCoords = coordsRes.ok ? await coordsRes.json() : [];
+    const shopsCoords = shopsRes.ok ? await shopsRes.json() : [];
+    const meetsCoords = meetsRes.ok
+      ? await meetsRes
+          .json()
+          .then((d) => d.map((m) => ({ ...m, type: "MEET" })))
+      : [];
+
+    const diningCoords = diningRes.ok
+      ? await diningRes.json().then((d) =>
+          d.map((r) => ({
+            ...r,
+            type: "RESTAURANT",
+            subtype: r.type,
+          }))
+        )
+      : [];
+
+    allStaticCoordinates = [
+      ...mainCoords,
+      ...shopsCoords,
+      ...diningCoords,
+      ...meetsCoords,
+    ];
+  } catch (error) {
+    console.error("Erreur chargement coordonnées:", error);
+  }
+}
+
+async function loadMapData() {
+  try {
+    const apiRes = await fetch(API_URL);
+    const apiData = apiRes.ok ? await apiRes.json() : { liveData: [] };
+    const liveDataMap = new Map();
+
+    (apiData.liveData || []).forEach((e) => {
+      if (e.name) liveDataMap.set(e.name.toUpperCase(), e);
     });
-};
 
-const closeMobileFilter = () => {
-    const container = document.getElementById('filter-container');
-    if (window.innerWidth < 600 && container?.classList.contains('visible')) {
-        container.classList.remove('visible');
-        document.getElementById('toggle-filter-btn').innerHTML = '&#x2699;';
-        document.getElementById('toggle-filter-btn').style.backgroundColor = 'var(--color-primary)';
-    }
-};
+    const mergedPois = allStaticCoordinates.map((staticPoi) => {
+      const poiName = staticPoi.titre || staticPoi.name;
+      const apiMatch = liveDataMap.get(poiName?.toUpperCase());
 
-// --- INITIALISATION ---
-
-const addFilterControls = () => {
-    const FilterControl = L.Control.extend({
-        onAdd: () => {
-            const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom filter-controls');
-            container.id = 'filter-container';
-            
-            const labels = { ALL:'Tout', ATTRACTION:'Attractions', SHOW:'Spectacles', MEET:'Meets', SHOP:'Boutiques', RESTAURANT:'Restaurants' };
-
-            CONFIG.FILTER_TYPES.forEach(type => {
-                const btn = L.DomUtil.create('button', 'filter-button', container);
-                btn.textContent = labels[type];
-                btn.dataset.filterType = type;
-                if (activeFilters.has(type)) L.DomUtil.addClass(btn, 'active');
-                
-                L.DomEvent.on(btn, 'click', (e) => {
-                    L.DomEvent.stop(e);
-                    toggleFilter(type, btn);
-                });
-            });
-            return container;
-        }
+      if (apiMatch) {
+        return {
+          ...staticPoi,
+          ...apiMatch,
+          entityType: staticPoi.type || apiMatch.entityType,
+          name: poiName,
+        };
+      }
+      return {
+        ...staticPoi,
+        status: staticPoi.status || "UNKNOWN",
+        entityType: staticPoi.type,
+        name: poiName,
+      };
     });
-    new FilterControl({position: 'topright'}).addTo(map);
-};
 
-const addGeolocation = () => {
-    const GeoControl = L.Control.extend({
-        onAdd: () => {
-            const div = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
-            div.innerHTML = '<a href="#" title="Ma position" style="font-size: 1.2em;"><i class="fas fa-crosshairs"></i></a>';
-            L.DomEvent.on(div, 'click', (e) => {
-                L.DomEvent.stop(e);
-                map.locate({setView: true, maxZoom: 16});
-            });
-            return div;
-        }
-    });
-    new GeoControl({position: 'topleft'}).addTo(map);
-    
-    map.on('locationfound', e => {
-        if (map.userMarker) map.removeLayer(map.userMarker);
-        if (map.userCircle) map.removeLayer(map.userCircle);
-        map.userMarker = L.marker(e.latlng).addTo(map).bindPopup("Vous êtes ici").openPopup();
-        map.userCircle = L.circle(e.latlng, e.accuracy).addTo(map);
-    });
-    map.on('locationerror', e => console.error("Loc error:", e.message));
-};
+    markersLayer.clearLayers();
 
-const initializeMap = () => {
-    if (!document.getElementById('map')) return;
-    if (map) map.remove();
+    const filteredPois = mergedPois.filter((e) =>
+      activeFilters.has(e.entityType || e.type)
+    );
 
-    map = L.map('map').setView(CONFIG.MAP_CENTER, CONFIG.INITIAL_ZOOM);
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap' }).addTo(map);
-    
-    markersLayer = L.markerClusterGroup({ spiderfyOnMaxZoom: true, showCoverageOnHover: false, zoomToBoundsOnClick: true, disableClusteringAtZoom: 18 });
-    map.addLayer(markersLayer);
+    filteredPois.forEach((entity) => {
+      const lat =
+        entity.lat || entity.coordinates?.latitude || entity.localisation?.lat;
+      const lon =
+        entity.lon || entity.coordinates?.longitude || entity.localisation?.lon;
 
-    addGeolocation();
-    addFilterControls();
-    
-    // Mobile toggle
-    const toggleBtn = document.getElementById('toggle-filter-btn');
-    if (toggleBtn) {
-        toggleBtn.addEventListener('click', () => {
-            const c = document.getElementById('filter-container');
-            c.classList.toggle('visible');
-            const isOpen = c.classList.contains('visible');
-            toggleBtn.innerHTML = isOpen ? '&times;' : '&#x2699;';
-            toggleBtn.style.backgroundColor = isOpen ? 'var(--color-red)' : 'var(--color-primary)';
-        });
-    }
+      if (lat && lon) {
+        const marker = L.marker([lat, lon], { icon: createCustomIcon(entity) });
+        marker.bindPopup(createPopupContent(entity));
 
-    loadDataAndRender();
-    setInterval(loadMapData, CONFIG.REFRESH_INTERVAL);
-};
-
-// --- CHARGEMENT DES DONNÉES ---
-
-const loadDataAndRender = async () => {
-    try {
-        const urls = Object.values(CONFIG.URLS);
-        const responses = await Promise.all(urls.map(url => fetch(url)));
-        const jsons = await Promise.all(responses.map(r => r.ok ? r.json() : []));
-
-        // Aplatir et typer les données statiques
-        allStaticCoordinates = jsons.flat().map(item => {
-            // Détection automatique du type si le JSON vient de meets.json (par index ou structure)
-            // Ici on assume que le dernier fichier chargé est MEETS et qu'on doit typer
-            if (item.horaires || item.titre) item.type = 'MEET'; // Fallback simple
-            return item;
-        });
-        
-        // Pour être sûr du typage MEET, on peut aussi utiliser l'index si l'ordre est garanti,
-        // mais la détection par propriété est plus robuste ici.
-
-        loadMapData();
-    } catch (e) {
-        console.error("Erreur chargement statique:", e);
-    }
-};
-
-const loadMapData = async () => {
-    console.log("Mise à jour carte...");
-    try {
-        const response = await fetch(CONFIG.API_URL);
-        if (!response.ok) throw new Error('API Error');
-        
-        const { liveData = [] } = await response.json();
-        const liveMap = new Map(liveData.filter(e => e.name).map(e => [e.name.toUpperCase(), e]));
-
-        const mergedPois = allStaticCoordinates.map(staticPoi => {
-            const name = staticPoi.name || staticPoi.titre;
-            const apiMatch = liveMap.get(name?.toUpperCase());
-            
-            const poi = { ...staticPoi, ...apiMatch, name };
-            poi.entityType = staticPoi.type || apiMatch?.entityType;
-            
-            // Normalisation lat/lon
-            poi.lat = poi.lat || poi.coordinates?.latitude || poi.localisation?.lat;
-            poi.lon = poi.lon || poi.coordinates?.longitude || poi.localisation?.lon;
-            
-            if (!poi.status) poi.status = 'UNKNOWN';
-            return poi;
-        });
-
-        markersLayer.clearLayers();
-
-        mergedPois
-            .filter(poi => {
-                let key = poi.entityType;
-                if (key === 'DINING') key = 'RESTAURANT';
-                return activeFilters.has(key);
+        const tooltipText = getWaitTimeText(entity);
+        if (tooltipText) {
+          const colorClass = `wait-time-tooltip-${getStatusColor(
+            entity
+          ).replace("#", "")}`;
+          marker
+            .bindTooltip(tooltipText, {
+              permanent: true,
+              direction: "top",
+              className: `wait-time-tooltip ${colorClass}`,
             })
-            .forEach(poi => {
-                if (poi.lat && poi.lon) {
-                    const marker = L.marker([poi.lat, poi.lon], { icon: createCustomIcon(poi) });
-                    marker.bindPopup(createPopupContent(poi));
-                    
-                    const tooltip = getWaitTimeText(poi);
-                    if (tooltip) {
-                        const colorClass = `wait-time-tooltip-${getStatusColor(poi).replace('#', '')}`;
-                        marker.bindTooltip(tooltip, { permanent: true, direction: 'top', className: `wait-time-tooltip ${colorClass}` });
-                    }
-                    markersLayer.addLayer(marker);
-                }
-            });
+            .openTooltip();
+        }
+        markersLayer.addLayer(marker);
+      }
+    });
+  } catch (error) {
+    console.error("Erreur mise à jour carte:", error);
+  }
+}
 
-    } catch (e) {
-        console.error("Erreur Update Map:", e);
-    }
-};
-
-// Lancement
-document.addEventListener('DOMContentLoaded', initializeMap);
+document.addEventListener("DOMContentLoaded", initializeMap);
