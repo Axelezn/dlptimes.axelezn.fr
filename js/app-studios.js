@@ -1,21 +1,16 @@
-// js/app-studios.js - V21 (Fix Recherche : Espacement des tuiles restauré)
+// js/app-studios.js - V23 (Tri basé sur timetables.js + Légende)
 
-// ⭐ CONSTANTES
 const CONFIG = {
     DESTINATION_ID: 'e8d0207f-da8a-4048-bec8-117aa946b2c2',
-    PARK_ID: 'ca888437-ebb4-4d50-aed2-d227f7096968', // Walt Disney Studios
+    PARK_ID: 'ca888437-ebb4-4d50-aed2-d227f7096968',
     API_URL: 'https://api.themeparks.wiki/v1/entity/e8d0207f-da8a-4048-bec8-117aa946b2c2/live',
     REFRESH_INTERVAL: 90000,
-    LAND_ORDER: [
-        "Hollywood Boulevard", 
-        "Production Courtyard / Front Lot", 
-        "Toon Studio", 
-        "Worlds of Pixar", 
-        "Avengers Campus", 
-        "Autre / Non Classé"
-    ],
+    LAND_ORDER: ["Hollywood Boulevard", "Production Courtyard / Front Lot", "Toon Studio", "Worlds of Pixar", "Avengers Campus", "Autre / Non Classé"],
     VIRTUAL_QUEUE_ATTRACTIONS: [] 
 };
+
+let isSortedByTime = false;
+let globalAttractionsData = [];
 
 // --- UTILITAIRES ---
 
@@ -33,10 +28,35 @@ const getLandName = (attraction) => {
 const getLogoFileName = (landName) => landName.toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, '_') + '_logo.png';
 
 const formatReturnTime = (isoString) => {
-    try {
-        return new Date(isoString).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }).replace(':', 'h');
-    } catch { return 'Heure inconnue'; }
+    try { return new Date(isoString).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }).replace(':', 'h'); } 
+    catch { return 'Heure inconnue'; }
 };
+
+// ⭐ NOUVEAU : Récupération de la catégorie via timetables.js ⭐
+const getSortCategory = (attraction) => {
+    const wait = attraction.queue?.STANDBY?.waitTime;
+    if (attraction.status !== 'OPERATING' || wait === null || wait === undefined) return "Fermé / Indisponible";
+
+    let cssClass = 'time-green'; 
+    if (typeof getTimeClass === 'function') {
+        cssClass = getTimeClass(attraction.name, wait);
+    }
+
+    if (cssClass.includes('gold')) return "Faible Affluence (Gold)";
+    if (cssClass.includes('green')) return "Attente Modérée (Vert)";
+    if (cssClass.includes('orange')) return "Attente Élevée (Orange)";
+    if (cssClass.includes('red')) return "Très Forte Attente (Rouge)";
+    
+    return "Attente Modérée (Vert)";
+};
+
+const TIME_CATEGORY_ORDER = [
+    "Faible Affluence (Gold)", 
+    "Attente Modérée (Vert)", 
+    "Attente Élevée (Orange)", 
+    "Très Forte Attente (Rouge)", 
+    "Fermé / Indisponible"
+];
 
 // --- GÉNÉRATION HTML ---
 
@@ -45,7 +65,7 @@ const createFavButton = (id) => {
     const isActive = window.isFavorite(id);
     const heart = isActive ? '❤️' : '🤍';
     const activeClass = isActive ? 'active' : '';
-    return `<button class="fav-btn ${activeClass}" onclick="event.stopPropagation(); window.toggleFavorite('${id}'); this.classList.toggle('active'); this.innerText = this.classList.contains('active') ? '❤️' : '🤍';" aria-label="Favoris">${heart}</button>`;
+    return `<button class="fav-btn ${activeClass}" data-id="${id}" aria-label="Favoris">${heart}</button>`;
 };
 
 const createDpaHtml = (queue) => {
@@ -66,7 +86,11 @@ const createWaitTimeHtml = (status, waitTime, attractionName) => {
     if (status === 'REFURBISHMENT') return `<div class="wait-time status-closed">Rénov.</div>`;
     if (CONFIG.VIRTUAL_QUEUE_ATTRACTIONS.includes(attractionName) && (waitTime === 0 || waitTime === null)) return `<div class="wait-time status-reservation">Réservation</div>`;
     if (waitTime === 0) return `<div class="wait-time status-opened">Ouvert</div>`;
-    const colorClass = (typeof getTimeClass === 'function') ? getTimeClass(attractionName, waitTime) : 'time-default';
+    
+    let colorClass = 'time-green'; 
+    if (typeof getTimeClass === 'function') {
+        colorClass = getTimeClass(attractionName, waitTime);
+    }
     return `<div class="wait-time ${colorClass}">${waitTime} min</div>`;
 };
 
@@ -77,7 +101,7 @@ const createSingleRiderHtml = (srTime) => {
 
 const createAttractionCardHtml = (attraction, land) => {
     const { id, name, status, queue } = attraction;
-    const waitTime = queue?.STANDBY?.waitTime ?? null;
+    const waitTime = (queue?.STANDBY?.waitTime !== undefined) ? queue.STANDBY.waitTime : null;
     let dpaHtml = createDpaHtml(queue);
     if (status !== 'OPERATING' && queue?.PAID_RETURN_TIME) dpaHtml = `<div class="dpa-details-container"><p class="dpa-label status-closed-single">Premier Access : Fermé</p></div>`;
 
@@ -99,6 +123,134 @@ const createAttractionCardHtml = (attraction, land) => {
     `;
 };
 
+// --- LOGIQUE FILTRES & TRI ---
+
+const renderFilters = () => {
+    const container = document.querySelector('.search-container');
+    if (document.querySelector('.filters-toolbar')) return;
+
+    const toolbar = document.createElement('div');
+    toolbar.className = 'filters-toolbar';
+    toolbar.innerHTML = `
+        <button id="sort-btn" class="btn-sort">
+            <span id="sort-icon">📍</span> <span id="sort-text">Trier par Temps</span>
+        </button>
+        <div class="legend-container">
+            <div class="legend-item"><span class="legend-dot dot-gold"></span> Gold</div>
+            <div class="legend-item"><span class="legend-dot dot-green"></span> Vert</div>
+            <div class="legend-item"><span class="legend-dot dot-orange"></span> Orange</div>
+            <div class="legend-item"><span class="legend-dot dot-red"></span> Rouge</div>
+        </div>
+    `;
+    container.after(toolbar);
+
+    document.getElementById('sort-btn').addEventListener('click', () => {
+        isSortedByTime = !isSortedByTime;
+        updateSortButtonUI();
+        renderAttractions(); 
+    });
+};
+
+const updateSortButtonUI = () => {
+    const btn = document.getElementById('sort-btn');
+    const icon = document.getElementById('sort-icon');
+    const text = document.getElementById('sort-text');
+    
+    if (isSortedByTime) {
+        btn.classList.add('active');
+        icon.innerText = '⏱️';
+        text.innerText = 'Trier par Land';
+    } else {
+        btn.classList.remove('active');
+        icon.innerText = '📍';
+        text.innerText = 'Trier par Temps';
+    }
+};
+
+// --- RENDER ---
+
+const renderAttractions = () => {
+    const listElement = document.getElementById('attractions-list-studios');
+    listElement.innerHTML = '';
+
+    if (!globalAttractionsData.length) {
+        listElement.innerHTML = '<div class="loading-message">Aucune donnée disponible.</div>';
+        return;
+    }
+
+    let fullHtml = '';
+
+    if (isSortedByTime) {
+        // --- TRI PAR TEMPS ---
+        const byTime = {};
+        TIME_CATEGORY_ORDER.forEach(cat => byTime[cat] = []);
+        
+        globalAttractionsData.forEach(attr => {
+            const cat = getSortCategory(attr);
+            if(byTime[cat]) byTime[cat].push(attr);
+            else { if(!byTime["Fermé / Indisponible"]) byTime["Fermé / Indisponible"] = []; byTime["Fermé / Indisponible"].push(attr); }
+        });
+
+        TIME_CATEGORY_ORDER.forEach(cat => {
+            if (byTime[cat] && byTime[cat].length > 0) {
+                let titleColor = '#fff';
+                if(cat.includes('Gold')) titleColor = '#ffc72c';
+                else if(cat.includes('Vert')) titleColor = 'var(--color-green)';
+                else if(cat.includes('Orange')) titleColor = '#ff8c00';
+                else if(cat.includes('Rouge')) titleColor = 'var(--color-red)';
+
+                fullHtml += `<div class="land-group">`;
+                fullHtml += `<h2 class="land-header" style="color:${titleColor}; border-bottom-color:${titleColor};">${cat}</h2>`;
+                
+                byTime[cat].sort((a, b) => {
+                    const wa = a.queue?.STANDBY?.waitTime ?? 999;
+                    const wb = b.queue?.STANDBY?.waitTime ?? 999;
+                    if(wa !== wb) return wa - wb;
+                    return a.name.localeCompare(b.name);
+                }).forEach(attr => {
+                    fullHtml += createAttractionCardHtml(attr, getLandName(attr));
+                });
+                fullHtml += `</div>`;
+            }
+        });
+
+    } else {
+        // --- TRI PAR LAND ---
+        const byLand = globalAttractionsData.reduce((acc, attr) => {
+            const land = getLandName(attr);
+            if (!acc[land]) acc[land] = [];
+            acc[land].push(attr);
+            return acc;
+        }, {});
+
+        CONFIG.LAND_ORDER.forEach(land => {
+            if (!byLand[land]) return;
+            
+            fullHtml += `<div class="land-group">`;
+            fullHtml += `<div class="land-header-container"><img src="./imgs/logos/${getLogoFileName(land)}" alt="${land}" class="land-logo"><h2 class="land-header">${land}</h2></div>`;
+            
+            byLand[land].sort((a, b) => {
+                if (typeof window.isFavorite === 'function') {
+                    const favA = window.isFavorite(a.id);
+                    const favB = window.isFavorite(b.id);
+                    if (favA !== favB) return favB - favA;
+                }
+                const statusA = a.status === 'OPERATING' ? 0 : 1;
+                const statusB = b.status === 'OPERATING' ? 0 : 1;
+                if (statusA !== statusB) return statusA - statusB;
+                return (a.queue?.STANDBY?.waitTime ?? 999) - (b.queue?.STANDBY?.waitTime ?? 999);
+            }).forEach(attr => fullHtml += createAttractionCardHtml(attr, land));
+            
+            fullHtml += `</div>`;
+        });
+    }
+
+    listElement.innerHTML = fullHtml;
+    
+    const searchInput = document.getElementById('search-input');
+    if (searchInput && searchInput.value) searchInput.dispatchEvent(new Event('input'));
+};
+
 // --- LOGIQUE D'INTERACTION ---
 
 const setupDpaListeners = () => {
@@ -116,51 +268,28 @@ const setupDpaListeners = () => {
     });
 };
 
-// ⭐ RECHERCHE CORRIGÉE : FLEX + COLUMN (POUR LE GAP) ⭐
 const setupSearch = () => {
     const searchInput = document.getElementById('search-input');
     if (!searchInput) return;
 
-    // 1. Filtrage en temps réel
     searchInput.addEventListener('input', (e) => {
         const term = e.target.value.toLowerCase().trim();
         document.querySelectorAll('.land-group').forEach(group => {
             const cards = group.querySelectorAll('.attraction-card');
             let hasVisibleCards = false;
-
             cards.forEach(card => {
                 const title = card.querySelector('h3').innerText.toLowerCase();
                 const isMatch = title.includes(term);
-                // On utilise Flex ici aussi pour la carte elle-même
                 card.style.display = isMatch ? 'flex' : 'none';
                 if (isMatch) hasVisibleCards = true;
             });
-            
-            // 🛑 C'EST ICI QUE ÇA SE JOUE :
-            // On remet 'flex' (pas 'block') pour que le CSS "gap: 15px" fonctionne !
             group.style.display = hasVisibleCards ? 'flex' : 'none';
-            
-            // Et on s'assure que c'est bien vertical
-            if(hasVisibleCards) {
-                group.style.flexDirection = 'column';
-            }
+            if(hasVisibleCards) group.style.flexDirection = 'column';
         });
     });
 
-    // 2. Touche "Entrée" -> Ferme le clavier (Blur)
-    searchInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-            e.preventDefault(); 
-            searchInput.blur(); 
-        }
-    });
-
-    // 3. Scroll de la page -> Ferme le clavier
-    window.addEventListener('scroll', () => {
-        if (document.activeElement === searchInput) {
-            searchInput.blur(); 
-        }
-    }, { passive: true });
+    searchInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); searchInput.blur(); } });
+    window.addEventListener('scroll', () => { if (document.activeElement === searchInput) searchInput.blur(); }, { passive: true });
 };
 
 // --- LOGIQUE PRINCIPALE ---
@@ -169,52 +298,19 @@ const fetchAttractionTimes = async () => {
     const listElement = document.getElementById('attractions-list-studios');
     if (!listElement) return console.error("Element #attractions-list-studios introuvable");
 
-    if (!listElement.innerHTML.trim()) listElement.innerHTML = '<div class="loading-message">⌛ Chargement...</div>';
+    if (!globalAttractionsData.length) listElement.innerHTML = '<div class="loading-message">⌛ Chargement...</div>';
 
     try {
         const response = await fetch(CONFIG.API_URL);
         if (!response.ok) throw new Error('API Error');
         const { liveData = [] } = await response.json();
         
-        const attractions = liveData.filter(e => e.entityType === 'ATTRACTION' && e.parkId === CONFIG.PARK_ID);
+        globalAttractionsData = liveData.filter(e => e.entityType === 'ATTRACTION' && e.parkId === CONFIG.PARK_ID);
         
-        if (!attractions.length) { listElement.innerHTML = '<div class="loading-message">Aucune attraction trouvée.</div>'; return; }
+        if (!globalAttractionsData.length) { listElement.innerHTML = '<div class="loading-message">Aucune attraction trouvée.</div>'; return; }
 
-        const byLand = attractions.reduce((acc, attr) => {
-            const land = getLandName(attr);
-            if (!acc[land]) acc[land] = [];
-            acc[land].push(attr);
-            return acc;
-        }, {});
-
-        let fullHtml = '';
-        CONFIG.LAND_ORDER.forEach(land => {
-            if (!byLand[land]) return;
-            
-            // ⭐ Wrapper .land-group pour le filtrage de recherche
-            fullHtml += `<div class="land-group">`;
-            fullHtml += `<div class="land-header-container"><img src="./imgs/logos/${getLogoFileName(land)}" alt="${land}" class="land-logo"><h2 class="land-header">${land}</h2></div>`;
-            
-            byLand[land].sort((a, b) => {
-                if (typeof window.isFavorite === 'function') {
-                    const favA = window.isFavorite(a.id);
-                    const favB = window.isFavorite(b.id);
-                    if (favA !== favB) return favB - favA; 
-                }
-                const statusA = a.status === 'OPERATING' ? 0 : 1;
-                const statusB = b.status === 'OPERATING' ? 0 : 1;
-                if (statusA !== statusB) return statusA - statusB;
-                return (a.queue?.STANDBY?.waitTime ?? 999) - (b.queue?.STANDBY?.waitTime ?? 999);
-            }).forEach(attr => fullHtml += createAttractionCardHtml(attr, land));
-            
-            fullHtml += `</div>`;
-        });
-
-        listElement.innerHTML = fullHtml;
-        
-        // Réappliquer la recherche si active pendant un refresh auto
-        const searchInput = document.getElementById('search-input');
-        if (searchInput && searchInput.value) searchInput.dispatchEvent(new Event('input'));
+        renderFilters();
+        renderAttractions();
 
     } catch (error) {
         console.error("Erreur API Studios:", error);

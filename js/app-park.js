@@ -1,4 +1,4 @@
-// js/app-park.js - V21 (Fix Recherche : Espacement des tuiles restauré)
+// js/app-park.js - V23 (Tri basé sur timetables.js + Légende)
 
 const CONFIG = {
     DESTINATION_ID: 'e8d0207f-da8a-4048-bec8-117aa946b2c2',
@@ -9,6 +9,10 @@ const CONFIG = {
     VIRTUAL_QUEUE_ATTRACTIONS: ["Meet Mickey Mouse", "Welcome to Starport: A Star Wars Encounter", "Princess Pavilion"],
     SHOOTING_GALLERY_NAME: "Rustler Roundup Shootin' Gallery"
 };
+
+// État global
+let isSortedByTime = false; 
+let globalAttractionsData = []; 
 
 // --- UTILITAIRES ---
 
@@ -29,6 +33,39 @@ const formatReturnTime = (isoString) => {
     try { return new Date(isoString).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }).replace(':', 'h'); } 
     catch { return 'Heure inconnue'; }
 };
+
+// ⭐ NOUVEAU : Récupère la catégorie basée sur la classe CSS de timetables.js ⭐
+const getSortCategory = (attraction) => {
+    const wait = attraction.queue?.STANDBY?.waitTime;
+    
+    // Si fermé ou pas de temps
+    if (attraction.status !== 'OPERATING' || wait === null || wait === undefined) {
+        return "Fermé / Indisponible";
+    }
+
+    // On utilise la fonction globale de timetables.js si elle existe
+    let cssClass = 'time-green'; // Défaut
+    if (typeof getTimeClass === 'function') {
+        cssClass = getTimeClass(attraction.name, wait);
+    }
+
+    // Mapping Classe CSS -> Titre du groupe
+    if (cssClass.includes('gold')) return "Faible Affluence (Gold)";
+    if (cssClass.includes('green')) return "Attente normale (Vert)";
+    if (cssClass.includes('orange')) return "Attente Élevée (Orange)";
+    if (cssClass.includes('red')) return "File à éviter (Rouge)";
+    
+    return "Attente Modérée (Vert)"; // Fallback
+};
+
+// Ordre d'affichage des groupes
+const TIME_CATEGORY_ORDER = [
+    "Faible Affluence (Gold)", 
+    "Attente normale (Vert)", 
+    "Attente Élevée (Orange)", 
+    "TFile à éviter (Rouge)", 
+    "Fermé / Indisponible"
+];
 
 // --- GÉNÉRATION HTML ---
 
@@ -60,7 +97,12 @@ const createWaitTimeHtml = (status, waitTime, attractionName) => {
     if (CONFIG.VIRTUAL_QUEUE_ATTRACTIONS.includes(attractionName) && (waitTime === 0 || waitTime === null)) return `<div class="wait-time status-reservation">Sur réservation</div>`;
     if (waitTime === 0) return `<div class="wait-time status-opened">Ouvert</div>`;
     
-    const colorClass = (typeof getTimeClass === 'function') ? getTimeClass(attractionName, waitTime) : 'time-default';
+    // ⭐ Appel à timetables.js pour la couleur ⭐
+    let colorClass = 'time-green'; 
+    if (typeof getTimeClass === 'function') {
+        colorClass = getTimeClass(attractionName, waitTime);
+    }
+
     return `<div class="wait-time ${colorClass}">${waitTime} min</div>`;
 };
 
@@ -72,7 +114,6 @@ const createSingleRiderHtml = (srTime) => {
 const createAttractionCardHtml = (attraction, land) => {
     const { id, name, status, queue } = attraction;
     const waitTime = (queue?.STANDBY?.waitTime !== undefined) ? queue.STANDBY.waitTime : null;
-    
     let dpaHtml = createDpaHtml(queue);
     if (status !== 'OPERATING' && queue?.PAID_RETURN_TIME) dpaHtml = `<div class="dpa-details-container"><p class="dpa-label status-closed-single">Premier Access : Fermé</p></div>`;
 
@@ -94,110 +135,111 @@ const createAttractionCardHtml = (attraction, land) => {
     `;
 };
 
-// --- LOGIQUE D'INTERACTION ---
+// --- LOGIQUE FILTRES & TRI ---
 
-const setupListeners = () => {
-    document.body.addEventListener('click', (e) => {
-        // 1. Gestion du DPA Toggle
-        const header = e.target.closest('.dpa-toggle-header');
-        if (header) {
-            const details = header.nextElementSibling;
-            const icon = header.querySelector('.dpa-toggle-icon');
-            if (details) {
-                const isHidden = details.style.display === 'none';
-                details.style.display = isHidden ? 'flex' : 'none';
-                icon?.classList.toggle('rotated', isHidden);
-            }
-            return;
-        }
+const renderFilters = () => {
+    const container = document.querySelector('.search-container');
+    if (document.querySelector('.filters-toolbar')) return;
 
-        // 2. Gestion du Bouton Favori
-        const favBtn = e.target.closest('.fav-btn');
-        if (favBtn && typeof window.toggleFavorite === 'function') {
-            e.stopPropagation();
-            const id = favBtn.dataset.id;
-            window.toggleFavorite(id);
-            const isActive = window.isFavorite(id);
-            favBtn.classList.toggle('active', isActive);
-            favBtn.innerText = isActive ? '❤️' : '🤍';
-        }
+    const toolbar = document.createElement('div');
+    toolbar.className = 'filters-toolbar';
+    toolbar.innerHTML = `
+        <button id="sort-btn" class="btn-sort">
+            <span id="sort-icon">📍</span> <span id="sort-text">Trier par Temps</span>
+        </button>
+        <div class="legend-container">
+            <p>Légende : </P>
+            <div class="legend-item"><span class="legend-dot dot-gold"></span> Très faible</div>
+            <div class="legend-item"><span class="legend-dot dot-green"></span> Normale</div>
+            <div class="legend-item"><span class="legend-dot dot-orange"></span> Elevée</div>
+            <div class="legend-item"><span class="legend-dot dot-red"></span> à éviter</div>
+        </div>
+    `;
+    container.after(toolbar);
+
+    document.getElementById('sort-btn').addEventListener('click', () => {
+        isSortedByTime = !isSortedByTime;
+        updateSortButtonUI();
+        renderAttractions(); 
     });
 };
 
-// ⭐ RECHERCHE CORRIGÉE : FLEX + COLUMN (POUR LE GAP) ⭐
-const setupSearch = () => {
-    const searchInput = document.getElementById('search-input');
-    if (!searchInput) return;
+const updateSortButtonUI = () => {
+    const btn = document.getElementById('sort-btn');
+    const icon = document.getElementById('sort-icon');
+    const text = document.getElementById('sort-text');
+    
+    if (isSortedByTime) {
+        btn.classList.add('active');
+        icon.innerText = '⏱️';
+        text.innerText = 'Trier par Land';
+    } else {
+        btn.classList.remove('active');
+        icon.innerText = '📍';
+        text.innerText = 'Trier par Temps';
+    }
+};
 
-    // 1. Filtrage en temps réel
-    searchInput.addEventListener('input', (e) => {
-        const term = e.target.value.toLowerCase().trim();
-        document.querySelectorAll('.land-group').forEach(group => {
-            const cards = group.querySelectorAll('.attraction-card');
-            let hasVisible = false;
-            
-            cards.forEach(card => {
-                const title = card.querySelector('h3').innerText.toLowerCase();
-                const match = title.includes(term);
-                // On utilise Flex ici aussi pour la carte elle-même
-                card.style.display = match ? 'flex' : 'none';
-                if (match) hasVisible = true;
-            });
-            
-            // 🛑 C'EST ICI QUE ÇA SE JOUE :
-            // On remet 'flex' (pas 'block') pour que le CSS "gap: 15px" fonctionne !
-            group.style.display = hasVisible ? 'flex' : 'none';
-            
-            // Et on s'assure que c'est bien vertical
-            if(hasVisible) {
-                group.style.flexDirection = 'column';
+// --- LOGIQUE D'AFFICHAGE (RENDER) ---
+
+const renderAttractions = () => {
+    const listElement = document.getElementById('attractions-list');
+    listElement.innerHTML = '';
+
+    if (!globalAttractionsData.length) {
+        listElement.innerHTML = '<div class="loading-message">Aucune donnée disponible.</div>';
+        return;
+    }
+
+    let fullHtml = '';
+
+    if (isSortedByTime) {
+        // --- TRI PAR TEMPS (GROUPÉ PAR COULEUR) ---
+        const byTime = {};
+        TIME_CATEGORY_ORDER.forEach(cat => byTime[cat] = []); // Init buckets
+        
+        globalAttractionsData.forEach(attr => {
+            const cat = getSortCategory(attr);
+            if(byTime[cat]) byTime[cat].push(attr);
+            else { 
+                // Sécurité si une catégorie inconnue arrive
+                if(!byTime["Fermé / Indisponible"]) byTime["Fermé / Indisponible"] = [];
+                byTime["Fermé / Indisponible"].push(attr);
             }
         });
-    });
 
-    // 2. Touche "Entrée" -> Ferme le clavier (Blur)
-    searchInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            searchInput.blur();
-        }
-    });
+        TIME_CATEGORY_ORDER.forEach(cat => {
+            if (byTime[cat] && byTime[cat].length > 0) {
+                let titleColor = '#fff';
+                if(cat.includes('Gold')) titleColor = '#ffc72c';
+                else if(cat.includes('Vert')) titleColor = 'var(--color-green)';
+                else if(cat.includes('Orange')) titleColor = '#ff8c00';
+                else if(cat.includes('Rouge')) titleColor = 'var(--color-red)';
 
-    // 3. Scroll de la page -> Ferme le clavier
-    window.addEventListener('scroll', () => {
-        if (document.activeElement === searchInput) {
-            searchInput.blur();
-        }
-    }, { passive: true });
-};
+                fullHtml += `<div class="land-group">`;
+                fullHtml += `<h2 class="land-header" style="color:${titleColor}; border-bottom-color:${titleColor};">${cat}</h2>`;
+                
+                byTime[cat].sort((a, b) => {
+                    const wa = a.queue?.STANDBY?.waitTime ?? 999;
+                    const wb = b.queue?.STANDBY?.waitTime ?? 999;
+                    if(wa !== wb) return wa - wb;
+                    return a.name.localeCompare(b.name);
+                }).forEach(attr => {
+                    fullHtml += createAttractionCardHtml(attr, getLandName(attr));
+                });
+                fullHtml += `</div>`;
+            }
+        });
 
-// --- LOGIQUE PRINCIPALE ---
-
-const fetchAttractionTimes = async () => {
-    const listElement = document.getElementById('attractions-list');
-    if (!listElement) return;
-
-    if (!listElement.innerHTML.trim()) listElement.innerHTML = '<div class="loading-message">⌛ Chargement...</div>';
-
-    try {
-        const response = await fetch(CONFIG.API_URL);
-        if (!response.ok) throw new Error('API Error');
-        const { liveData = [] } = await response.json();
-        
-        const attractions = liveData
-            .filter(e => e.entityType === 'ATTRACTION' && e.parkId === CONFIG.PARK_ID)
-            .map(e => ({ ...e }));
-        
-        if (!attractions.length) { listElement.innerHTML = '<div class="loading-message">Aucune attraction.</div>'; return; }
-
-        const byLand = attractions.reduce((acc, attr) => {
+    } else {
+        // --- TRI PAR LAND (DÉFAUT) ---
+        const byLand = globalAttractionsData.reduce((acc, attr) => {
             const land = getLandName(attr);
             if (!acc[land]) acc[land] = [];
             acc[land].push(attr);
             return acc;
         }, {});
 
-        let fullHtml = '';
         CONFIG.LAND_ORDER.forEach(land => {
             if (!byLand[land]) return;
             
@@ -218,11 +260,85 @@ const fetchAttractionTimes = async () => {
             
             fullHtml += `</div>`;
         });
+    }
 
-        listElement.innerHTML = fullHtml;
+    listElement.innerHTML = fullHtml;
+    
+    const searchInput = document.getElementById('search-input');
+    if (searchInput && searchInput.value) searchInput.dispatchEvent(new Event('input'));
+};
+
+// --- LOGIQUE D'INTERACTION ---
+
+const setupListeners = () => {
+    document.body.addEventListener('click', (e) => {
+        const header = e.target.closest('.dpa-toggle-header');
+        if (header) {
+            const details = header.nextElementSibling;
+            const icon = header.querySelector('.dpa-toggle-icon');
+            if (details) {
+                const isHidden = details.style.display === 'none';
+                details.style.display = isHidden ? 'flex' : 'none';
+                icon?.classList.toggle('rotated', isHidden);
+            }
+            return;
+        }
+
+        const favBtn = e.target.closest('.fav-btn');
+        if (favBtn && typeof window.toggleFavorite === 'function') {
+            e.stopPropagation();
+            const id = favBtn.dataset.id;
+            window.toggleFavorite(id);
+            const isActive = window.isFavorite(id);
+            favBtn.classList.toggle('active', isActive);
+            favBtn.innerText = isActive ? '❤️' : '🤍';
+        }
+    });
+};
+
+const setupSearch = () => {
+    const searchInput = document.getElementById('search-input');
+    if (!searchInput) return;
+
+    searchInput.addEventListener('input', (e) => {
+        const term = e.target.value.toLowerCase().trim();
+        document.querySelectorAll('.land-group').forEach(group => {
+            const cards = group.querySelectorAll('.attraction-card');
+            let hasVisible = false;
+            cards.forEach(card => {
+                const title = card.querySelector('h3').innerText.toLowerCase();
+                const match = title.includes(term);
+                card.style.display = match ? 'flex' : 'none';
+                if (match) hasVisible = true;
+            });
+            group.style.display = hasVisible ? 'flex' : 'none';
+            if(hasVisible) group.style.flexDirection = 'column';
+        });
+    });
+
+    searchInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); searchInput.blur(); } });
+    window.addEventListener('scroll', () => { if (document.activeElement === searchInput) searchInput.blur(); }, { passive: true });
+};
+
+// --- LOGIQUE PRINCIPALE ---
+
+const fetchAttractionTimes = async () => {
+    const listElement = document.getElementById('attractions-list');
+    if (!listElement) return;
+
+    if (!globalAttractionsData.length) listElement.innerHTML = '<div class="loading-message">⌛ Chargement...</div>';
+
+    try {
+        const response = await fetch(CONFIG.API_URL);
+        if (!response.ok) throw new Error('API Error');
+        const { liveData = [] } = await response.json();
         
-        const searchInput = document.getElementById('search-input');
-        if (searchInput && searchInput.value) searchInput.dispatchEvent(new Event('input'));
+        globalAttractionsData = liveData
+            .filter(e => e.entityType === 'ATTRACTION' && e.parkId === CONFIG.PARK_ID)
+            .map(e => ({ ...e }));
+        
+        renderFilters();
+        renderAttractions();
 
     } catch (error) {
         console.error(error);

@@ -467,3 +467,63 @@ main {
     content: "📜 "; 
     margin-right: 5px;
 }
+/* --- BARRE DE FILTRES & LÉGENDE --- */
+.filters-toolbar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    padding: 0 10px;
+}
+
+/* Bouton de Tri */
+.btn-sort {
+    background-color: var(--attraction-card-bg);
+    border: 2px solid var(--color-secondary);
+    color: var(--color-text-light);
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.btn-sort:hover, .btn-sort.active {
+    background-color: var(--color-secondary);
+    color: var(--color-primary);
+}
+
+/* Légende des couleurs */
+.legend-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    font-size: 0.8em;
+    color: #b0b0d0;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+/* Couleurs des points de légende (identiques aux temps) */
+.dot-gold { background-color: #ffc72c; box-shadow: 0 0 5px #ffc72c; }
+.dot-green { background-color: var(--color-green); }
+.dot-orange { background-color: #ff8c00; }
+.dot-red { background-color: var(--color-red); }
