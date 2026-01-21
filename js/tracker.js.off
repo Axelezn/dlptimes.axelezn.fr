@@ -1,7 +1,5 @@
 // js/tracker.js - V5 (Refactored & Cleaned)
 
-const WEBHOOK_URL = 'https://discord.com/api/webhooks/1199721277070528574/W8KdV7AcOpGzF5L6_bpbFEQndq0TL9qWP-tLyZ29JohKsWGk3-fwigpXPoJEbAngAYT_'; 
-
 /**
  * Récupère les détails techniques du navigateur client.
  */
