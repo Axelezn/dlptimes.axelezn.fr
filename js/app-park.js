@@ -1,4 +1,4 @@
-// js/app-park.js - V23 (Tri basé sur timetables.js + Légende)
+// js/app-park.js - V26 (Fix: 0min classé dans "Normal" + Moyenne sous titre)
 
 const CONFIG = {
     DESTINATION_ID: 'e8d0207f-da8a-4048-bec8-117aa946b2c2',
@@ -10,7 +10,6 @@ const CONFIG = {
     SHOOTING_GALLERY_NAME: "Rustler Roundup Shootin' Gallery"
 };
 
-// État global
 let isSortedByTime = false; 
 let globalAttractionsData = []; 
 
@@ -34,7 +33,7 @@ const formatReturnTime = (isoString) => {
     catch { return 'Heure inconnue'; }
 };
 
-// ⭐ NOUVEAU : Récupère la catégorie basée sur la classe CSS de timetables.js ⭐
+// ⭐ FIX ICI : 0 min => Catégorie Normale (Vert) ⭐
 const getSortCategory = (attraction) => {
     const wait = attraction.queue?.STANDBY?.waitTime;
     
@@ -43,8 +42,11 @@ const getSortCategory = (attraction) => {
         return "Fermé / Indisponible";
     }
 
-    // On utilise la fonction globale de timetables.js si elle existe
-    let cssClass = 'time-green'; // Défaut
+    // EXCEPTION : Si 0 min, on le force dans le vert
+    if (wait === 0) return "Attente normale (Vert)";
+
+    // Sinon, on suit la logique des couleurs
+    let cssClass = 'time-green'; 
     if (typeof getTimeClass === 'function') {
         cssClass = getTimeClass(attraction.name, wait);
     }
@@ -55,15 +57,14 @@ const getSortCategory = (attraction) => {
     if (cssClass.includes('orange')) return "Attente Élevée (Orange)";
     if (cssClass.includes('red')) return "File à éviter (Rouge)";
     
-    return "Attente Modérée (Vert)"; // Fallback
+    return "Attente normale (Vert)"; // Fallback
 };
 
-// Ordre d'affichage des groupes
 const TIME_CATEGORY_ORDER = [
     "Faible Affluence (Gold)", 
     "Attente normale (Vert)", 
     "Attente Élevée (Orange)", 
-    "TFile à éviter (Rouge)", 
+    "File à éviter (Rouge)", 
     "Fermé / Indisponible"
 ];
 
@@ -97,7 +98,6 @@ const createWaitTimeHtml = (status, waitTime, attractionName) => {
     if (CONFIG.VIRTUAL_QUEUE_ATTRACTIONS.includes(attractionName) && (waitTime === 0 || waitTime === null)) return `<div class="wait-time status-reservation">Sur réservation</div>`;
     if (waitTime === 0) return `<div class="wait-time status-opened">Ouvert</div>`;
     
-    // ⭐ Appel à timetables.js pour la couleur ⭐
     let colorClass = 'time-green'; 
     if (typeof getTimeClass === 'function') {
         colorClass = getTimeClass(attractionName, waitTime);
@@ -148,7 +148,7 @@ const renderFilters = () => {
             <span id="sort-icon">📍</span> <span id="sort-text">Trier par Temps</span>
         </button>
         <div class="legend-container">
-            <p>Légende : </P>
+            <p style="margin:0; font-weight:600; font-size:0.9em;">Légende : </p>
             <div class="legend-item"><span class="legend-dot dot-gold"></span> Très faible</div>
             <div class="legend-item"><span class="legend-dot dot-green"></span> Normale</div>
             <div class="legend-item"><span class="legend-dot dot-orange"></span> Elevée</div>
@@ -194,15 +194,14 @@ const renderAttractions = () => {
     let fullHtml = '';
 
     if (isSortedByTime) {
-        // --- TRI PAR TEMPS (GROUPÉ PAR COULEUR) ---
+        // --- TRI PAR TEMPS ---
         const byTime = {};
-        TIME_CATEGORY_ORDER.forEach(cat => byTime[cat] = []); // Init buckets
+        TIME_CATEGORY_ORDER.forEach(cat => byTime[cat] = []); 
         
         globalAttractionsData.forEach(attr => {
             const cat = getSortCategory(attr);
             if(byTime[cat]) byTime[cat].push(attr);
             else { 
-                // Sécurité si une catégorie inconnue arrive
                 if(!byTime["Fermé / Indisponible"]) byTime["Fermé / Indisponible"] = [];
                 byTime["Fermé / Indisponible"].push(attr);
             }
@@ -232,7 +231,7 @@ const renderAttractions = () => {
         });
 
     } else {
-        // --- TRI PAR LAND (DÉFAUT) ---
+        // --- TRI PAR LAND ---
         const byLand = globalAttractionsData.reduce((acc, attr) => {
             const land = getLandName(attr);
             if (!acc[land]) acc[land] = [];
@@ -242,10 +241,10 @@ const renderAttractions = () => {
 
         CONFIG.LAND_ORDER.forEach(land => {
             if (!byLand[land]) return;
-            
+
             fullHtml += `<div class="land-group">`;
             fullHtml += `<div class="land-header-container"><img src="./imgs/logos/${getLogoFileName(land)}" alt="${land}" class="land-logo"><h2 class="land-header">${land}</h2></div>`;
-            
+
             byLand[land].sort((a, b) => {
                 if (typeof window.isFavorite === 'function') {
                     const favA = window.isFavorite(a.id);

@@ -1,4 +1,4 @@
-// js/app-studios.js - V23 (Tri basé sur timetables.js + Légende)
+// js/app-studios.js - V24 (Fix: 0min classé dans "Normal")
 
 const CONFIG = {
     DESTINATION_ID: 'e8d0207f-da8a-4048-bec8-117aa946b2c2',
@@ -32,29 +32,37 @@ const formatReturnTime = (isoString) => {
     catch { return 'Heure inconnue'; }
 };
 
-// ⭐ NOUVEAU : Récupération de la catégorie via timetables.js ⭐
+// ⭐ FIX ICI : 0 min => Catégorie Normale (Vert) ⭐
 const getSortCategory = (attraction) => {
     const wait = attraction.queue?.STANDBY?.waitTime;
-    if (attraction.status !== 'OPERATING' || wait === null || wait === undefined) return "Fermé / Indisponible";
+    
+    // Si fermé ou pas de temps
+    if (attraction.status !== 'OPERATING' || wait === null || wait === undefined) {
+        return "Fermé / Indisponible";
+    }
 
+    // EXCEPTION : Si 0 min, on le force dans le vert
+    if (wait === 0) return "Attente normale (Vert)";
+
+    // Sinon, on suit la logique des couleurs
     let cssClass = 'time-green'; 
     if (typeof getTimeClass === 'function') {
         cssClass = getTimeClass(attraction.name, wait);
     }
 
     if (cssClass.includes('gold')) return "Faible Affluence (Gold)";
-    if (cssClass.includes('green')) return "Attente Modérée (Vert)";
+    if (cssClass.includes('green')) return "Attente normale (Vert)";
     if (cssClass.includes('orange')) return "Attente Élevée (Orange)";
-    if (cssClass.includes('red')) return "Très Forte Attente (Rouge)";
+    if (cssClass.includes('red')) return "File à éviter (Rouge)";
     
-    return "Attente Modérée (Vert)";
+    return "Attente normale (Vert)";
 };
 
 const TIME_CATEGORY_ORDER = [
     "Faible Affluence (Gold)", 
-    "Attente Modérée (Vert)", 
+    "Attente normale (Vert)", 
     "Attente Élevée (Orange)", 
-    "Très Forte Attente (Rouge)", 
+    "File à éviter (Rouge)", 
     "Fermé / Indisponible"
 ];
 
@@ -136,11 +144,11 @@ const renderFilters = () => {
             <span id="sort-icon">📍</span> <span id="sort-text">Trier par Temps</span>
         </button>
         <div class="legend-container">
-            <p>Légende : </p>
+            <p style="margin:0; font-weight:600; font-size:0.9em;">Légende : </p>
             <div class="legend-item"><span class="legend-dot dot-gold"></span> Très faible</div>
             <div class="legend-item"><span class="legend-dot dot-green"></span> Normale</div>
             <div class="legend-item"><span class="legend-dot dot-orange"></span> Elevée</div>
-            <div class="legend-item"><span class="legend-dot dot-red"></span> a éviter</div>
+            <div class="legend-item"><span class="legend-dot dot-red"></span> à éviter</div>
         </div>
     `;
     container.after(toolbar);
@@ -189,7 +197,10 @@ const renderAttractions = () => {
         globalAttractionsData.forEach(attr => {
             const cat = getSortCategory(attr);
             if(byTime[cat]) byTime[cat].push(attr);
-            else { if(!byTime["Fermé / Indisponible"]) byTime["Fermé / Indisponible"] = []; byTime["Fermé / Indisponible"].push(attr); }
+            else { 
+                if(!byTime["Fermé / Indisponible"]) byTime["Fermé / Indisponible"] = [];
+                byTime["Fermé / Indisponible"].push(attr);
+            }
         });
 
         TIME_CATEGORY_ORDER.forEach(cat => {
@@ -226,10 +237,9 @@ const renderAttractions = () => {
 
         CONFIG.LAND_ORDER.forEach(land => {
             if (!byLand[land]) return;
-            
             fullHtml += `<div class="land-group">`;
             fullHtml += `<div class="land-header-container"><img src="./imgs/logos/${getLogoFileName(land)}" alt="${land}" class="land-logo"><h2 class="land-header">${land}</h2></div>`;
-            
+
             byLand[land].sort((a, b) => {
                 if (typeof window.isFavorite === 'function') {
                     const favA = window.isFavorite(a.id);
