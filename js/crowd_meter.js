@@ -65,7 +65,7 @@ async function loadCrowdLevel() {
             level = 'Faible';
             icon = '🟢';
             colorClass = 'crowd-low';
-        } else if (average <= 35) {
+        } else if (average <= 40) {
             level = 'Modérée';
             icon = '🟠';
             colorClass = 'crowd-medium';

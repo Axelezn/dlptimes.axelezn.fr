@@ -5,7 +5,7 @@ const CONFIG = {
     PARK_ID: 'ca888437-ebb4-4d50-aed2-d227f7096968',
     API_URL: 'https://api.themeparks.wiki/v1/entity/e8d0207f-da8a-4048-bec8-117aa946b2c2/live',
     REFRESH_INTERVAL: 90000,
-    LAND_ORDER: ["Hollywood Boulevard", "Production Courtyard / Front Lot", "Toon Studio", "Worlds of Pixar", "Avengers Campus", "Autre / Non Classé"],
+    LAND_ORDER: ["Hollywood Boulevard", "World Premiere Plaza", "Toon Studio", "Worlds of Pixar", "Avengers Campus", "Autre / Non Classé"],
     VIRTUAL_QUEUE_ATTRACTIONS: [] 
 };
 
@@ -19,9 +19,9 @@ const getLandName = (attraction) => {
     if (externalId.startsWith('P2AC')) return "Avengers Campus"; 
     if (externalId.startsWith('P2TM')) return "Toon Studio"; 
     if (externalId.startsWith('P2HA')) return "Hollywood Boulevard"; 
-    if (externalId.startsWith('P2ZA')) return "Production Courtyard / Front Lot";
+    if (externalId.startsWith('P2ZA')) return "World Premiere Plaza";
     if (externalId.startsWith('P2XA0') || externalId.startsWith('P2E')) return "Worlds of Pixar";
-    if (name.includes("Studio Theater") || name.includes("Front Lot")) return "Production Courtyard / Front Lot";
+    if (name.includes("Studio Theater") || name.includes("Front Lot")) return "World Premiere Plaza";
     return "Autre / Non Classé";
 };
 
@@ -136,10 +136,11 @@ const renderFilters = () => {
             <span id="sort-icon">📍</span> <span id="sort-text">Trier par Temps</span>
         </button>
         <div class="legend-container">
-            <div class="legend-item"><span class="legend-dot dot-gold"></span> Gold</div>
-            <div class="legend-item"><span class="legend-dot dot-green"></span> Vert</div>
-            <div class="legend-item"><span class="legend-dot dot-orange"></span> Orange</div>
-            <div class="legend-item"><span class="legend-dot dot-red"></span> Rouge</div>
+            <p>Légende : </p>
+            <div class="legend-item"><span class="legend-dot dot-gold"></span> Très faible</div>
+            <div class="legend-item"><span class="legend-dot dot-green"></span> Normale</div>
+            <div class="legend-item"><span class="legend-dot dot-orange"></span> Elevée</div>
+            <div class="legend-item"><span class="legend-dot dot-red"></span> a éviter</div>
         </div>
     `;
     container.after(toolbar);
