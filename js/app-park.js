@@ -92,7 +92,7 @@ const createDpaHtml = (queue) => {
 
 const createWaitTimeHtml = (status, waitTime, attractionName) => {
     if (attractionName === CONFIG.SHOOTING_GALLERY_NAME && status === 'OPERATING') return `<div class="wait-time status-payant">Ouvert : 3€</div>`;
-    if (status === 'DOWN') return `<div class="wait-time status-down">Panne Technique</div>`;
+    if (status === 'DOWN') return `<div class="wait-time status-down">Panne</div>`;
     if (status === 'CLOSED' || waitTime === null) return `<div class="wait-time status-closed">Fermé</div>`;
     if (status === 'REFURBISHMENT') return `<div class="wait-time status-closed">Rénov.</div>`;
     if (CONFIG.VIRTUAL_QUEUE_ATTRACTIONS.includes(attractionName) && (waitTime === 0 || waitTime === null)) return `<div class="wait-time status-reservation">Sur réservation</div>`;
@@ -148,11 +148,11 @@ const renderFilters = () => {
             <span id="sort-icon">📍</span> <span id="sort-text">Trier par Temps</span>
         </button>
         <div class="legend-container">
-            <p style="margin:0; font-weight:600; font-size:0.9em;">Légende : </p>
+            <p style="margin:0; font-weight:600; font-size:0.9em;">Affluence : </p>
             <div class="legend-item"><span class="legend-dot dot-gold"></span> Très faible</div>
             <div class="legend-item"><span class="legend-dot dot-green"></span> Normale</div>
             <div class="legend-item"><span class="legend-dot dot-orange"></span> Elevée</div>
-            <div class="legend-item"><span class="legend-dot dot-red"></span> à éviter</div>
+            <div class="legend-item"><span class="legend-dot dot-red"></span>Bondée</div>
         </div>
     `;
     container.after(toolbar);

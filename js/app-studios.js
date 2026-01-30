@@ -144,11 +144,11 @@ const renderFilters = () => {
             <span id="sort-icon">📍</span> <span id="sort-text">Trier par Temps</span>
         </button>
         <div class="legend-container">
-            <p style="margin:0; font-weight:600; font-size:0.9em;">Légende : </p>
+            <p style="margin:0; font-weight:600; font-size:0.9em;">Affluence : </p>
             <div class="legend-item"><span class="legend-dot dot-gold"></span> Très faible</div>
             <div class="legend-item"><span class="legend-dot dot-green"></span> Normale</div>
             <div class="legend-item"><span class="legend-dot dot-orange"></span> Elevée</div>
-            <div class="legend-item"><span class="legend-dot dot-red"></span> à éviter</div>
+            <div class="legend-item"><span class="legend-dot dot-red"></span> Bondée</div>
         </div>
     `;
     container.after(toolbar);

@@ -1,4 +1,4 @@
-// js/app-favorites.js - V7 (Fix Disparition Meets + Debug Logs)
+// js/app-favorites.js - V8 (Fix: Compatibilité IDs Restaurants String/Number)
 
 const FAV_CONFIG = {
     // API 1 : Attractions & Shows
@@ -7,7 +7,6 @@ const FAV_CONFIG = {
     // API 2 : Meets (DLPWait)
     API_MEETS: "https://api.dlpwait.com/",
     
-    // ⭐ QUERY CORRIGÉE (Identique à app-meet.js V27) ⭐
     QUERY_MEETS: `query { 
         entertainment { 
             id 
@@ -23,7 +22,8 @@ const FAV_CONFIG = {
     }`,
 
     // API 3 : Restaurants (Local)
-    API_RESTOS: './js/json/restaurants.json',
+    // Assurez-vous que ce chemin est correct par rapport à votre fichier HTML favoris
+    API_RESTOS: 'js/json/restaurants.json',
     
     REFRESH_INTERVAL: 60000,
     
@@ -31,7 +31,7 @@ const FAV_CONFIG = {
     PARK_ID_DLP: 'dae968d5-630d-4719-8b06-3d107e944401',
     PARK_ID_WDS: 'ca888437-ebb4-4d50-aed2-d227f7096968',
     LANDS_DLP: ["Main Street, U.S.A.", "Frontierland", "Adventureland", "Fantasyland", "Discoveryland"],
-    LANDS_WDS: ["Hollywood Boulevard", "Production Courtyard / Front Lot", "Toon Studio", "Worlds of Pixar", "Avengers Campus"]
+    LANDS_WDS: ["Hollywood Boulevard", "World Premiere Plaza", "Toon Studio", "Worlds of Pixar", "Avengers Campus"]
 };
 
 // --- UTILITAIRES ---
@@ -41,7 +41,7 @@ const getLandName = (attraction) => {
     if (externalId.startsWith('P2AC')) return "Avengers Campus"; 
     if (externalId.startsWith('P2TM')) return "Toon Studio"; 
     if (externalId.startsWith('P2HA')) return "Hollywood Boulevard"; 
-    if (externalId.startsWith('P2ZA') || name.includes("Studio Theater")) return "Production Courtyard / Front Lot";
+    if (externalId.startsWith('P2ZA') || name.includes("Studio Theater")) return "World Premiere Plaza";
     if (externalId.startsWith('P2XA0') || externalId.startsWith('P2E')) return "Worlds of Pixar";
     if (externalId.startsWith('P1RA')) return "Frontierland"; 
     if (externalId.startsWith('P1DA') || externalId.endsWith('G103')) return "Discoveryland"; 
@@ -87,6 +87,7 @@ const getTimeBoxClass = (minutes) => {
     return 'time-far-box';
 };
 
+// --- Helpers Restaurants ---
 const getTypeIcon = (type) => {
     if (!type) return "🍴";
     const t = type.toLowerCase();
@@ -296,13 +297,23 @@ const loadFavoritesPage = async () => {
             return { data: { entertainment: [] } }; // Fallback vide
         });
 
-        const restosPromise = fetch(FAV_CONFIG.API_RESTOS).then(r => r.json()).catch(e => []);
+        // ⭐ Modification ici pour rendre le fetch restaurants robuste ⭐
+        const restosPromise = fetch(FAV_CONFIG.API_RESTOS)
+            .then(r => {
+                if(!r.ok) throw new Error("File introuvable"); 
+                return r.json();
+            })
+            .catch(e => {
+                console.warn("⚠️ Impossible de charger restaurants.json (vérifiez le chemin)", e);
+                return []; 
+            });
 
         const [dataParks, dataMeets, dataRestos] = await Promise.all([parksPromise, meetsPromise, restosPromise]);
 
-        const myFavAttractions = (dataParks.liveData || []).filter(e => favoriteIds.includes(e.id));
-        const myFavMeets = (dataMeets.data?.entertainment || []).filter(e => favoriteIds.includes(e.id));
-        const myFavRestos = (dataRestos || []).filter(e => favoriteIds.includes(e.id));
+        // ⭐ LE CORRECTIF EST ICI (String conversion) ⭐
+        const myFavAttractions = (dataParks.liveData || []).filter(e => favoriteIds.includes(String(e.id)));
+        const myFavMeets = (dataMeets.data?.entertainment || []).filter(e => favoriteIds.includes(String(e.id)));
+        const myFavRestos = (dataRestos || []).filter(e => favoriteIds.includes(String(e.id))); // Force string ID
 
         console.log(`✅ Found: ${myFavAttractions.length} Attractions, ${myFavMeets.length} Meets, ${myFavRestos.length} Restos`);
 

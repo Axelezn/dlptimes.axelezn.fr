@@ -1,193 +1,314 @@
-// js/app-restaurants.js - V5 (Style Tuile Attraction + Bouton CSS)
+// js/app-restaurants.js - V14 (Fix Recherche: Masquage des titres vides)
 
-const CONFIG = {
-    // Vérifiez bien que votre fichier est ICI. 
-    // Si c'est dans "data/", changez le chemin ci-dessous !
-    DATA_URL: './js/json/restaurants.json', 
-    REFRESH_INTERVAL: 60000 
-};
+{
+  // 🛡️ Bloc d'isolation
 
-// --- UTILITAIRES ---
+  const RESTO_CONFIG = {
+    DATA_URL: "js/json/restaurants.json",
+    REFRESH_INTERVAL: 60000,
+  };
 
-const getParkFromLand = (landName) => {
+  // Stockage global des données
+  let globalRestoData = [];
+
+  // État des filtres
+  let activeFilters = {
+    price: null,
+    type: null,
+  };
+
+  // --- UTILITAIRES ---
+
+  const getParkCategory = (landName) => {
+    if (!landName) return "Autres";
     const dlpLands = ["Main Street, U.S.A.", "Fantasyland", "Discoveryland", "Frontierland", "Adventureland"];
-    return dlpLands.includes(landName) ? "Parc Disneyland" : "Walt Disney Studios Park";
-};
+    if (dlpLands.includes(landName)) return "Parc Disneyland";
 
-const getTypeIcon = (type) => {
+    const wdsLands = ["Front Lot", "Avengers Campus", "Worlds of Pixar", "Toon Studio", "Production Courtyard", "World Premiere Plaza", "Walt Disney Studios Park"];
+    if (wdsLands.includes(landName)) return "Walt Disney Studios Park";
+
+    if (landName === "Disney Village") return "Disney Village";
+
+    if (landName.includes("Hôtel") || landName.includes("Hotel") || landName.includes("Lodge") || landName.includes("Club") || landName.includes("Ranch")) {
+      return "Hôtels Disney";
+    }
+    return "Autres";
+  };
+
+  const getTypeIcon = (type) => {
     if (!type) return "🍴";
     const t = type.toLowerCase();
     if (t.includes("rapide") || t.includes("fast")) return "🍔";
     if (t.includes("table")) return "🍽️";
     if (t.includes("buffet")) return "🥗";
     if (t.includes("emporter") || t.includes("snack")) return "🥡";
+    if (t.includes("glace")) return "🍦";
+    if (t.includes("bar")) return "🍹";
     return "🍴";
-};
+  };
 
-const getPriceDisplay = (price) => {
-    if (!price) return "";
+  const getPriceDisplay = (price) => {
+    if (!price || price === "/") return "";
     if (price === "€") return '<span style="color:#28a745; font-weight:bold;">€</span><span style="color:#555;">€€</span>';
     if (price === "€€") return '<span style="color:#ffc72c; font-weight:bold;">€€</span><span style="color:#555;">€</span>';
     if (price === "€€€") return '<span style="color:#dc3545; font-weight:bold;">€€€</span>';
     return price;
-};
+  };
 
-// --- GÉNÉRATION HTML ---
+  // --- GÉNÉRATION HTML ---
 
-const createFavButton = (id) => {
-    if (typeof window.isFavorite !== 'function') return '';
+  const createFavButton = (id) => {
+    if (typeof window.isFavorite !== "function") return "";
     const isActive = window.isFavorite(id);
-    const heart = isActive ? '❤️' : '🤍';
-    const activeClass = isActive ? 'active' : '';
-    return `<button class="fav-btn ${activeClass}" onclick="event.stopPropagation(); window.toggleFavorite('${id}'); this.classList.toggle('active'); this.innerText = this.classList.contains('active') ? '❤️' : '🤍';">${heart}</button>`;
-};
+    const heart = isActive ? "❤️" : "🤍";
+    const activeClass = isActive ? "active" : "";
+    return `<button class="fav-btn ${activeClass}" 
+            onclick="event.stopPropagation(); window.toggleFavorite('${id}'); this.classList.toggle('active'); this.innerText = this.classList.contains('active') ? '❤️' : '🤍';">
+            ${heart}
+        </button>`;
+  };
 
-const createRestoCard = (resto) => {
-    const icon = getTypeIcon(resto.type);
-    const nom = resto.name || resto.titre; 
-    
-    // --- 1. BADGES ---
-    let badges = '';
-    if (resto.reservation) {
-        badges += `<span style="font-size:0.75em; background:#00287a; color:#fff; padding:3px 6px; border-radius:4px; margin-right:5px; white-space:nowrap; display:inline-block; margin-top:4px;">📱 Réservation</span>`;
-    }
-    if (resto.clickAndCollect) {
-        badges += `<span style="font-size:0.75em; background:#e67e22; color:#fff; padding:3px 6px; border-radius:4px; margin-right:5px; white-space:nowrap; display:inline-block; margin-top:4px;">🛍️ Click&Collect</span>`;
-    }
+  const createRestoCard = (resto) => {
+    const icon = getTypeIcon(resto.type || "");
+    const nom = resto.name || resto.titre || "Restaurant";
+    const cuisine = resto.cuisine || "";
+    const menuUrl = resto.menuUrl || "";
 
-    // --- 2. BOUTON MENU (Classe CSS .btn-menu) ---
-    let menuHtml = '';
-    // On affiche le bouton seulement s'il y a une URL valide
-    if (resto.menuUrl && resto.menuUrl.length > 5) {
-        menuHtml = `<a href="${resto.menuUrl}" target="_blank" class="btn-menu">Voir le menu</a>`;
+    let badges = "";
+    if (resto.reservation) badges += `<span class="badge badge-blue">📱 Réservation</span>`;
+    if (resto.clickAndCollect) badges += `<span class="badge badge-orange">🛍️ Click&Collect</span>`;
+
+    let menuHtml = "";
+    if (menuUrl.length > 5) {
+      menuHtml = `<a href="${menuUrl}" class="btn-menu"> Voir le menu</a>`;
     }
 
-    // --- 3. PRIX & HORAIRES ---
     const prixHtml = getPriceDisplay(resto.priceRange || resto.prix);
-    
-    // DEBUG : Voir ce que l'on reçoit pour les horaires
-    // console.log(`Resto: ${nom} | Horaires: ${resto.horaires}`);
-
     let horairesText = resto.horaires;
-    let horairesClass = "status-single-rider"; // Vert (Style bandeau)
-    
-    // Si vide ou undefined
+    let horairesClass = "status-single-rider";
+
     if (!horairesText || horairesText === "") {
-        horairesText = "Horaires NC";
-        horairesClass = "time-past-box"; // Gris
-    }
-    
-    // Si statut Fermé
-    if ((resto.status && resto.status === "CLOSED") || (resto.statut && resto.statut.toLowerCase().includes("fermé"))) {
-        horairesText = "Fermé";
-        horairesClass = "status-closed-single"; // Rouge
+      horairesText = "Horaires NC";
+      horairesClass = "time-past-box";
     }
 
-    // --- 4. STRUCTURE HTML (Strictement identique aux attractions) ---
+    if (resto.status && (resto.status === "CLOSED" || resto.status === "FERME" || resto.status === "FERMÉ")) {
+      horairesText = "Fermé";
+      horairesClass = "status-closed-single";
+    }
+
     return `
-        <div class="attraction-card" id="resto-${resto.id}">
-            <div class="attraction-info">
-                <div style="display:flex; justify-content:space-between; align-items:start; padding-right:5px;">
-                    <h3 style="margin:0;">${nom}</h3>
-                    ${createFavButton(resto.id)}
+            <div class="attraction-card" id="resto-${resto.id}">
+                <div class="attraction-info">
+                    <div style="display:flex; justify-content:space-between; align-items:start; padding-right:5px;">
+                        <h3 style="margin:0;">${nom}</h3>
+                        ${createFavButton(resto.id)}
+                    </div>
+                    
+                    <p style="color:#ffc72c; margin-top:2px; font-weight:600;">
+                        ${icon} ${resto.type || ""} 
+                        ${cuisine ? `<span style="color:#b0b0d0; font-weight:400;">• ${cuisine}</span>` : ""}
+                    </p>
+                    
+                    <div style="margin-top:4px; display:flex; flex-wrap:wrap; gap:5px;">${badges}</div>
+                    <div style="margin-top:10px;">${menuHtml}</div>
                 </div>
-                
-                <p style="color:#ffc72c; margin-top:2px; font-weight:600;">
-                    ${icon} ${resto.type} 
-                    ${resto.cuisine ? `<span style="color:#b0b0d0; font-weight:400;">• ${resto.cuisine}</span>` : ''}
-                </p>
-                <p style="font-size:0.85em; color:#bbb; margin-top:2px;">📍 ${resto.land}</p>
-                
-                <div style="margin-top:2px;">${badges}</div>
-                
-                ${menuHtml}
-            </div>
 
-            <div class="wait-times-container">
-                <div class="wait-time" style="background-color: #222; border: 1px solid #444; color: #fff; padding: 8px 0; min-width: 65px; display:flex; justify-content:center;">
-                    ${prixHtml}
-                </div>
-                
-                <div class="wait-time single-rider-time ${horairesClass}" style="margin-top:5px;">
-                    ${horairesText}
+                <div class="wait-times-container">
+                    <div class="wait-time" style="background-color: #222; border: 1px solid #444; color: #fff; padding: 8px 0; min-width: 65px; display:flex; justify-content:center;">
+                        ${prixHtml}
+                    </div>
+                    <div class="wait-time single-rider-time ${horairesClass}" style="margin-top:5px;">
+                        ${horairesText}
+                    </div>
                 </div>
             </div>
-        </div>
-    `;
-};
+        `;
+  };
 
-// --- MOTEUR ---
+  // --- GESTION DES FILTRES ---
 
-const loadRestaurants = async () => {
-    const listElement = document.getElementById('restaurants-list');
-    if (!listElement) return;
+  const setupFilters = () => {
+    const searchContainer = document.querySelector(".search-container");
+    if (!searchContainer || document.getElementById("filters-container")) return;
 
-    if (!listElement.querySelector('.park-group')) {
-        listElement.innerHTML = '<div class="loading-message">🍔 Préparation de la cuisine...</div>';
+    const filterDiv = document.createElement("div");
+    filterDiv.id = "filters-container";
+    filterDiv.className = "filters-scroll-container";
+
+    const filters = [
+      { label: "€", type: "price", value: "€" },
+      { label: "€€", type: "price", value: "€€" },
+      { label: "€€€", type: "price", value: "€€€" },
+      { label: "🍔 Rapide", type: "type", value: "rapide" },
+      { label: "🍽️ Table", type: "type", value: "table" },
+      { label: "🥗 Buffet", type: "type", value: "buffet" },
+      { label: "🥡 Snack", type: "type", value: "snack" },
+    ];
+
+    filters.forEach((f) => {
+      const btn = document.createElement("button");
+      btn.className = "filter-chip";
+      btn.innerText = f.label;
+      btn.onclick = () => toggleFilter(f.type, f.value, btn);
+      filterDiv.appendChild(btn);
+    });
+
+    searchContainer.appendChild(filterDiv);
+  };
+
+  const toggleFilter = (type, value, btn) => {
+    if (activeFilters[type] === value) {
+      activeFilters[type] = null;
+      btn.classList.remove("active");
+    } else {
+      activeFilters[type] = value;
+      const siblings = btn.parentElement.querySelectorAll(".filter-chip");
+      siblings.forEach((s) => {
+        if (type === "price" && s.innerText.includes("€")) s.classList.remove("active");
+        if (type === "type" && !s.innerText.includes("€")) s.classList.remove("active");
+      });
+      btn.classList.add("active");
+    }
+    renderList(globalRestoData);
+  };
+
+  // --- RENDU DE LA LISTE (MOTEUR) ---
+
+  const renderList = (data) => {
+    const listElement = document.getElementById("restaurants-list");
+    listElement.innerHTML = "";
+
+    // 1. FILTRAGE
+    const filteredData = data.filter((resto) => {
+      if (activeFilters.price && (resto.priceRange || resto.prix) !== activeFilters.price) return false;
+      if (activeFilters.type) {
+        const rType = (resto.type || "").toLowerCase();
+        if (!rType.includes(activeFilters.type)) return false;
+      }
+      return true;
+    });
+
+    if (filteredData.length === 0) {
+      listElement.innerHTML = '<div class="loading-message">Aucun restaurant ne correspond à vos filtres 🥺</div>';
+      return;
+    }
+
+    // 2. HIERARCHIE
+    const hierarchy = {};
+    const categoryOrder = ["Parc Disneyland", "Walt Disney Studios Park", "Disney Village", "Hôtels Disney", "Autres"];
+
+    filteredData.forEach((resto) => {
+      const land = resto.land || "Inconnu";
+      const category = getParkCategory(land);
+      if (!hierarchy[category]) hierarchy[category] = {};
+      if (!hierarchy[category][land]) hierarchy[category][land] = [];
+      hierarchy[category][land].push(resto);
+    });
+
+    // 3. AFFICHAGE AVEC WRAPPERS (Important pour le masquage)
+    categoryOrder.forEach((catName) => {
+      if (hierarchy[catName]) {
+        // ⭐ NOUVEAU : On enveloppe tout le parc dans un div container
+        const categoryWrapper = document.createElement("div");
+        categoryWrapper.className = "category-wrapper";
+
+        const mainHeader = document.createElement("h2");
+        mainHeader.className = "park-show-header major-header";
+        mainHeader.innerText = catName;
+        categoryWrapper.appendChild(mainHeader);
+
+        const landsObj = hierarchy[catName];
+        const sortedLands = Object.keys(landsObj).sort();
+
+        sortedLands.forEach((landName) => {
+          const landContainer = document.createElement("div");
+          landContainer.className = "park-group";
+
+          const landHeader = document.createElement("h3");
+          landHeader.className = "land-header";
+          landHeader.innerHTML = `📍 ${landName}`;
+          landContainer.appendChild(landHeader);
+
+          const restos = landsObj[landName].sort((a, b) => {
+            if (typeof window.isFavorite === "function") {
+              const favA = window.isFavorite(a.id);
+              const favB = window.isFavorite(b.id);
+              if (favA !== favB) return favB - favA;
+            }
+            return (a.name || a.titre).localeCompare(b.name || b.titre);
+          });
+
+          restos.forEach((r) => {
+            landContainer.innerHTML += createRestoCard(r);
+          });
+
+          categoryWrapper.appendChild(landContainer);
+        });
+
+        listElement.appendChild(categoryWrapper);
+      }
+    });
+  };
+
+  // --- CHARGEMENT INITIAL ---
+
+  const loadRestaurants = async () => {
+    const listElement = document.getElementById("restaurants-list");
+    if (!listElement.querySelector(".park-group")) {
+      listElement.innerHTML = '<div class="loading-message">🍔 Préparation de la cuisine...</div>';
     }
 
     try {
-        const response = await fetch(CONFIG.DATA_URL);
-        if (!response.ok) throw new Error("Erreur JSON (Vérifiez le chemin du fichier !)");
-        const data = await response.json();
+      const urlWithNoCache = `${RESTO_CONFIG.DATA_URL}?t=${Date.now()}`;
+      const response = await fetch(urlWithNoCache);
+      if (!response.ok) throw new Error("Erreur JSON");
+      globalRestoData = await response.json();
 
-        // On trie les données et on les groupe
-        const byPark = { "Parc Disneyland": [], "Walt Disney Studios Park": [], "Disney Village": [], "Hôtels": [] };
-        
-        data.forEach(resto => {
-            let park = getParkFromLand(resto.land);
-            if (resto.land === "Disney Village") park = "Disney Village";
-            if (byPark[park]) byPark[park].push(resto);
-            else byPark["Hôtels"].push(resto);
-        });
+      setupFilters();
+      renderList(globalRestoData);
 
-        listElement.innerHTML = '';
+      // --- GESTION RECHERCHE INTELLIGENTE ---
+      const searchInput = document.getElementById("search-input");
+      if (searchInput) {
+        searchInput.addEventListener("input", (e) => {
+          const term = e.target.value.toLowerCase().trim();
 
-        Object.keys(byPark).forEach(parkName => {
-            const restos = byPark[parkName];
-            if (restos.length > 0) {
-                // Tri par nom
-                restos.sort((a, b) => (a.name || a.titre).localeCompare(b.name || b.titre));
-                
-                const cards = restos.map(r => createRestoCard(r)).join('');
-                // Notez l'ajout de la classe .park-group ici
-                listElement.innerHTML += `<div class="park-group"><h2 class="park-show-header">${parkName}</h2>${cards}</div>`;
-            }
-        });
+          // 1. On parcourt chaque catégorie (Parc)
+          const categories = document.querySelectorAll(".category-wrapper");
+          
+          categories.forEach((category) => {
+            let hasVisibleLand = false;
 
-        // Relance la recherche si besoin
-        const searchInput = document.getElementById('search-input');
-        if (searchInput && searchInput.value) searchInput.dispatchEvent(new Event('input'));
+            // 2. On parcourt chaque Land dans la catégorie
+            const lands = category.querySelectorAll(".park-group");
 
-    } catch (e) {
-        console.error(e);
-        listElement.innerHTML = `<div class="loading-message status-closed">❌ Erreur : ${e.message}</div>`;
-    }
-};
+            lands.forEach((land) => {
+              let hasVisibleResto = false;
+              const cards = land.querySelectorAll(".attraction-card");
 
-// ... (Le reste du code Search reste inchangé) ...
-const setupSearch = () => {
-    const searchInput = document.getElementById('search-input');
-    if (!searchInput) return;
-    searchInput.addEventListener('input', (e) => {
-        const term = e.target.value.toLowerCase().trim();
-        document.querySelectorAll('.park-group').forEach(group => {
-            const cards = group.querySelectorAll('.attraction-card');
-            let hasVisible = false;
-            cards.forEach(c => {
-                const text = c.innerText.toLowerCase(); 
-                c.style.display = text.includes(term) ? 'flex' : 'none';
-                if(text.includes(term)) hasVisible = true;
+              // 3. On parcourt chaque Resto dans le Land
+              cards.forEach((card) => {
+                const visible = card.innerText.toLowerCase().includes(term);
+                card.style.display = visible ? "flex" : "none";
+                if (visible) hasVisibleResto = true;
+              });
+
+              // Si le land n'a aucun resto visible, on le cache
+              land.style.display = hasVisibleResto ? "flex" : "none";
+              if (hasVisibleResto) hasVisibleLand = true;
             });
-            group.style.display = hasVisible ? 'block' : 'none';
-        });
-    });
-    const closeKey = () => searchInput.blur();
-    searchInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); closeKey(); } });
-    window.addEventListener('scroll', () => { if (document.activeElement === searchInput) closeKey(); }, { passive: true });
-};
 
-document.addEventListener('DOMContentLoaded', () => {
-    loadRestaurants();
-    setupSearch();
-});
+            // Si la catégorie n'a aucun land visible, on la cache (y compris le titre H2)
+            category.style.display = hasVisibleLand ? "block" : "none";
+          });
+        });
+      }
+    } catch (e) {
+      console.error(e);
+      listElement.innerHTML = `<div class="loading-message status-closed">❌ Erreur chargement JSON</div>`;
+    }
+  };
+
+  document.addEventListener("DOMContentLoaded", loadRestaurants);
+} // 🛡️ Fin

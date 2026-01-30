@@ -51,7 +51,13 @@ const getLocation = (entity) => {
     else if (eid.startsWith('P1GS21')) loc.land = "Itinéraire Parade";
     else if (eid.startsWith('P1GS34')) loc.land = "Frontierland Theater";
     else if (eid.startsWith('P2GS58')) loc.land = "Studio Theater";
-    else if (eid.startsWith('P2YS03')) loc.land = "Production Courtyard";
+    else if (eid.startsWith('P2YS03')) loc.land = "World Premiere Plaza";
+    else if (eid.startsWith('P1GS99')) loc.land = "Central Plaza / Main Street";
+    else if (eid.startsWith('P2GS54')) loc.land = "Animation Celebration";
+    else if (eid.startsWith('P2GS23')) loc.land ="Animation Celebration";
+    else if (eid.startsWith('P2GS63')) loc.land = "Avengers CAMPUS";
+    else if (eid.startsWith('P2GS58')) loc.land ="Studio Theater";
+    else if (eid.startsWith('P2YS08')) loc.land="Animagique Theater";
     else if (entity.areaName) loc.land = entity.areaName;
     else loc.land = eid.startsWith('P1') ? "Disneyland Park" : "Studios Park";
 
