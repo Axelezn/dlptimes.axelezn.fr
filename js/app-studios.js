@@ -1,4 +1,4 @@
-// js/app-studios.js - V24 (Fix: 0min classé dans "Normal")
+// js/app-studios.js - V27 (Fix: Favoris réactivés + Tri Couleurs + Passage Libre)
 
 const CONFIG = {
     DESTINATION_ID: 'e8d0207f-da8a-4048-bec8-117aa946b2c2',
@@ -32,43 +32,45 @@ const formatReturnTime = (isoString) => {
     catch { return 'Heure inconnue'; }
 };
 
-// ⭐ FIX ICI : 0 min => Catégorie Normale (Vert) ⭐
+// ⭐ TRI ET CATÉGORIES (Nettoyage des noms) ⭐
 const getSortCategory = (attraction) => {
     const wait = attraction.queue?.STANDBY?.waitTime;
     
-    // Si fermé ou pas de temps
     if (attraction.status !== 'OPERATING' || wait === null || wait === undefined) {
         return "Fermé / Indisponible";
     }
 
-    // EXCEPTION : Si 0 min, on le force dans le vert
-    if (wait === 0) return "Attente normale (Vert)";
+    // Si 0 min => Passage libre 
+    if (wait === 0) return "Passage libre";
 
-    // Sinon, on suit la logique des couleurs
     let cssClass = 'time-green'; 
     if (typeof getTimeClass === 'function') {
         cssClass = getTimeClass(attraction.name, wait);
     }
 
-    if (cssClass.includes('gold')) return "Faible Affluence (Gold)";
-    if (cssClass.includes('green')) return "Attente normale (Vert)";
-    if (cssClass.includes('orange')) return "Attente Élevée (Orange)";
-    if (cssClass.includes('red')) return "File à éviter (Rouge)";
+    // CORRECTION : Les noms doivent être identiques à ceux de TIME_CATEGORY_ORDER
+    if (cssClass.includes('gold')) return "Faible Affluence";
+    if (cssClass.includes('green')) return "Attente normale"; // Pas de (Vert) ici !
+    if (cssClass.includes('orange')) return "Attente Élevée";
+    if (cssClass.includes('red')) return "File à éviter";
     
-    return "Attente normale (Vert)";
+    return "Attente normale";
 };
 
+// Ordre d'affichage
 const TIME_CATEGORY_ORDER = [
-    "Faible Affluence (Gold)", 
-    "Attente normale (Vert)", 
-    "Attente Élevée (Orange)", 
-    "File à éviter (Rouge)", 
+    "Faible Affluence", 
+    "Attente normale", 
+    "Attente Élevée", 
+    "File à éviter", 
+    "Passage libre", 
     "Fermé / Indisponible"
 ];
 
 // --- GÉNÉRATION HTML ---
 
 const createFavButton = (id) => {
+    // Vérification que le gestionnaire de favoris est bien chargé
     if (typeof window.isFavorite !== 'function') return '';
     const isActive = window.isFavorite(id);
     const heart = isActive ? '❤️' : '🤍';
@@ -93,6 +95,8 @@ const createWaitTimeHtml = (status, waitTime, attractionName) => {
     if (status === 'CLOSED' || waitTime === null) return `<div class="wait-time status-closed">Fermé</div>`;
     if (status === 'REFURBISHMENT') return `<div class="wait-time status-closed">Rénov.</div>`;
     if (CONFIG.VIRTUAL_QUEUE_ATTRACTIONS.includes(attractionName) && (waitTime === 0 || waitTime === null)) return `<div class="wait-time status-reservation">Réservation</div>`;
+    
+    // Affichage "Ouvert" si 0 min
     if (waitTime === 0) return `<div class="wait-time status-opened">Ouvert</div>`;
     
     let colorClass = 'time-green'; 
@@ -205,11 +209,13 @@ const renderAttractions = () => {
 
         TIME_CATEGORY_ORDER.forEach(cat => {
             if (byTime[cat] && byTime[cat].length > 0) {
+                
                 let titleColor = '#fff';
-                if(cat.includes('Gold')) titleColor = '#ffc72c';
-                else if(cat.includes('Vert')) titleColor = 'var(--color-green)';
-                else if(cat.includes('Orange')) titleColor = '#ff8c00';
-                else if(cat.includes('Rouge')) titleColor = 'var(--color-red)';
+                if(cat === "Faible Affluence") titleColor = '#ffc72c';
+                else if(cat === "Attente normale") titleColor = 'var(--color-green)';
+                else if(cat === "Attente Élevée") titleColor = '#ff8c00';
+                else if(cat === "File à éviter") titleColor = 'var(--color-red)';
+                else if(cat === "Passage libre") titleColor = '#5bc0de';
 
                 fullHtml += `<div class="land-group">`;
                 fullHtml += `<h2 class="land-header" style="color:${titleColor}; border-bottom-color:${titleColor};">${cat}</h2>`;
@@ -237,9 +243,10 @@ const renderAttractions = () => {
 
         CONFIG.LAND_ORDER.forEach(land => {
             if (!byLand[land]) return;
+            
             fullHtml += `<div class="land-group">`;
             fullHtml += `<div class="land-header-container"><img src="./imgs/logos/${getLogoFileName(land)}" alt="${land}" class="land-logo"><h2 class="land-header">${land}</h2></div>`;
-
+            
             byLand[land].sort((a, b) => {
                 if (typeof window.isFavorite === 'function') {
                     const favA = window.isFavorite(a.id);
@@ -264,8 +271,10 @@ const renderAttractions = () => {
 
 // --- LOGIQUE D'INTERACTION ---
 
-const setupDpaListeners = () => {
+// ⭐ FIX : Renommé pour plus de clarté et ajout de la logique FAVORIS
+const setupListeners = () => {
     document.body.addEventListener('click', (e) => {
+        // 1. Gestion des DPA (Premier Access)
         const header = e.target.closest('.dpa-toggle-header');
         if (header) {
             const details = header.nextElementSibling;
@@ -275,6 +284,18 @@ const setupDpaListeners = () => {
                 details.style.display = isHidden ? 'flex' : 'none';
                 icon?.classList.toggle('rotated', isHidden);
             }
+            return;
+        }
+
+        // 2. Gestion des Favoris (C'est ce qui manquait !)
+        const favBtn = e.target.closest('.fav-btn');
+        if (favBtn && typeof window.toggleFavorite === 'function') {
+            e.stopPropagation();
+            const id = favBtn.dataset.id;
+            window.toggleFavorite(id);
+            const isActive = window.isFavorite(id);
+            favBtn.classList.toggle('active', isActive);
+            favBtn.innerText = isActive ? '❤️' : '🤍';
         }
     });
 };
@@ -332,6 +353,6 @@ const fetchAttractionTimes = async () => {
 document.addEventListener('DOMContentLoaded', () => {
     fetchAttractionTimes();
     setInterval(fetchAttractionTimes, CONFIG.REFRESH_INTERVAL);
-    setupDpaListeners();
+    setupListeners(); // Appel de la fonction corrigée
     setupSearch(); 
 });
