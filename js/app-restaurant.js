@@ -24,8 +24,8 @@
     const dlpLands = ["Main Street, U.S.A.", "Fantasyland", "Discoveryland", "Frontierland", "Adventureland"];
     if (dlpLands.includes(landName)) return "Parc Disneyland";
 
-    const wdsLands = ["Front Lot", "Avengers Campus", "Worlds of Pixar", "Toon Studio", "Production Courtyard", "World Premiere Plaza", "Walt Disney Studios Park", "Adventure Way", "World Of Frozen"];
-    if (wdsLands.includes(landName)) return "Disney Adventure Worlds";
+    const wdsLands = ["Front Lot", "Avengers Campus", "Worlds of Pixar", "Toon Studio", "Production Courtyard", "World Premiere Plaza", "Adventure Way", "Adventure Way", "World Of Frozen"];
+    if (wdsLands.includes(landName)) return "Disney Adventure World";
 
     if (landName === "Disney Village") return "Disney Village";
 
@@ -196,7 +196,7 @@
 
     // 2. HIERARCHIE
     const hierarchy = {};
-    const categoryOrder = ["Parc Disneyland", "Disney Adventure Worlds", "Disney Village", "Hôtels Disney", "Autres"];
+    const categoryOrder = ["Parc Disneyland", "Disney Adventure World", "Disney Village", "Hôtels Disney", "Autres"];
 
     filteredData.forEach((resto) => {
       const land = resto.land || "Inconnu";

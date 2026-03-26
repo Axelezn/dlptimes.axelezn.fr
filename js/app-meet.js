@@ -62,7 +62,11 @@
         "The White Rabbit":"Le Lapin Blanc",
         "Tigger":"Tigrou",
         "Winnie l'Ourson or friends":"Winnie l'Ourson ou ses amis",
-        'MARVEL Super Hero Heroic Encounter':"Marvel Hero Training Center"
+        'MARVEL Super Hero Heroic Encounter':"Marvel Hero Training Center",
+        'a Character from' : "un personnage de",
+        "or her friends":"ou ses amis",
+        "across Europe":"à travers l'Europe",
+        "Mysterious Meetings":"Rencontres Mystérieuses",
     };
 
     // --- UTILITAIRES ---
@@ -267,7 +271,7 @@
             });
 
             listElement.innerHTML = '';
-            const parkOrder = ["Parc Disneyland", "Walt Disney Studios Park", "Autres"];
+            const parkOrder = ["Parc Disneyland", "Disney Adventure World", "Autres"];
 
             parkOrder.forEach(parkName => {
                 if (!grouped[parkName]) return;

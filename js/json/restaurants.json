@@ -881,9 +881,9 @@
   {
     "id": "520",
     "name": "The Regal View Restaurant & Lounge",
-    "land": "Walt Disney Studios Park",
+    "land": "Adventure Way",
     "type": "Service à table",
-    "cuisine": "",
+    "cuisine": "Européenne",
     "lat": 48.8662255,
     "lon": 2.7755192,
     "parkId": "47f90d0c-a90f-4318-8094-1a938c40751a",

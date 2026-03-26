@@ -5,7 +5,6 @@ const CONFIG = {
     PARK_ID: 'ca888437-ebb4-4d50-aed2-d227f7096968',
     API_URL: 'https://api.themeparks.wiki/v1/entity/e8d0207f-da8a-4048-bec8-117aa946b2c2/live',
     REFRESH_INTERVAL: 90000,
-    // ⭐ NOUVEAU : Ajout des deux nouveaux Lands ⭐
     LAND_ORDER: ["Hollywood Boulevard", "World Premiere Plaza", "Toon Studio", "Worlds of Pixar", "Avengers Campus", "World of Frozen", "Adventure Way", "Autre / Non Classé"],
     VIRTUAL_QUEUE_ATTRACTIONS: [] 
 };
@@ -13,7 +12,6 @@ const CONFIG = {
 let isSortedByTime = false;
 let globalAttractionsData = [];
 
-// --- UTILITAIRES ---
 
 const getLandName = (attraction) => {
     const { externalId = '', name } = attraction;
@@ -21,8 +19,6 @@ const getLandName = (attraction) => {
     if (externalId.startsWith('P2TM')) return "Toon Studio"; 
     if (externalId.startsWith('P2HA')) return "Hollywood Boulevard"; 
     if (externalId.startsWith('P2ZA')) return "World Premiere Plaza";
-    
-    // ⭐ NOUVEAU : Doit être placé AVANT P2E pour éviter le conflit avec Pixar
     if (externalId.startsWith('P2EA')) return "World of Frozen"; 
     if (externalId.startsWith('P2DA')) return "Adventure Way";
     

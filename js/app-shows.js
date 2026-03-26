@@ -1,4 +1,4 @@
-// js/app-shows.js - V33 (UX Mobile Améliorée + Filtrage Strict)
+// js/app-shows.js - V34 (Fix: Renommage WDS en Disney Adventure World)
 
 // ⭐ CONSTANTES
 const CONFIG = {
@@ -28,7 +28,7 @@ const translateShowName = (name) => {
         "Disney Princess Holiday Season Celebration": "Les Princesses Disney célèbrent les Fêtes de Fin d'Année",
         "Holiday Gathering" : "Retrouvailles de Fêtes",
         "Let’s Sing Christmas!":"Spectacle musical Chantons Noël !",
-        "Mickey's Dazzling Christmas Parade!":"Micket et sa Parade Etincelante de Noël !",
+        "Mickey's Dazzling Christmas Parade!":"Mickey et sa Parade Etincelante de Noël !",
         "Mickey’s PhilharMagic": "Mickey et son Orchestre PhilharMagique",
         "Princess Aurora's Magical Wishes":"Les Voeux Magiques de la Princesse Aurore",
         "The Lion King: Rhythms of the Pride Lands":"Le Roi Lion et les Rythmes de la Terre",
@@ -44,7 +44,8 @@ const getLocation = (entity) => {
     let loc = { park: "Inconnu", land: "" };
     
     if (entity.parkId === CONFIG.PARK_ID_DLP) loc.park = "Parc Disneyland";
-    else if (entity.parkId === CONFIG.PARK_ID_WDS) loc.park = "Walt Disney Studios Park";
+    // ⭐ CORRECTION ICI : Le nom officiel
+    else if (entity.parkId === CONFIG.PARK_ID_WDS) loc.park = "Disney Adventure World";
 
     const eid = entity.externalId || '';
     if (eid.startsWith('P1') && eid.endsWith('G103')) loc.land = "Discoveryland Theater";
@@ -55,11 +56,10 @@ const getLocation = (entity) => {
     else if (eid.startsWith('P1GS99')) loc.land = "Central Plaza / Main Street";
     else if (eid.startsWith('P2GS54')) loc.land = "Animation Celebration";
     else if (eid.startsWith('P2GS23')) loc.land ="Animation Celebration";
-    else if (eid.startsWith('P2GS63')) loc.land = "Avengers CAMPUS";
-    else if (eid.startsWith('P2GS58')) loc.land ="Studio Theater";
+    else if (eid.startsWith('P2GS63')) loc.land = "Avengers Campus";
     else if (eid.startsWith('P2YS08')) loc.land="Animagique Theater";
     else if (entity.areaName) loc.land = entity.areaName;
-    else loc.land = eid.startsWith('P1') ? "Disneyland Park" : "Studios Park";
+    else loc.land = eid.startsWith('P1') ? "Parc Disneyland" : "Disney Adventure World";
 
     return loc;
 };
@@ -288,6 +288,7 @@ const fetchShowTimes = async () => {
             return acc;
         }, {});
 
+        // ⭐ L'ordre correspond maintenant au vrai nom que vous générez ⭐
         const parkOrder = ["Parc Disneyland", "Disney Adventure World", "Inconnu"];
 
         parkOrder.forEach(park => {

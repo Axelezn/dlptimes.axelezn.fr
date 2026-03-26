@@ -31,7 +31,7 @@ const FAV_CONFIG = {
     PARK_ID_DLP: 'dae968d5-630d-4719-8b06-3d107e944401',
     PARK_ID_WDS: 'ca888437-ebb4-4d50-aed2-d227f7096968',
     LANDS_DLP: ["Main Street, U.S.A.", "Frontierland", "Adventureland", "Fantasyland", "Discoveryland"],
-    LANDS_WDS: ["Hollywood Boulevard", "World Premiere Plaza", "Toon Studio", "Worlds of Pixar", "Avengers Campus"]
+    LANDS_WDS: ["Hollywood Boulevard", "World Premiere Plaza", "Toon Studio", "Worlds of Pixar", "Avengers Campus", "World of Frozen", "Adventure Way"]
 };
 
 // --- UTILITAIRES ---
@@ -41,6 +41,8 @@ const getLandName = (attraction) => {
     if (externalId.startsWith('P2AC')) return "Avengers Campus"; 
     if (externalId.startsWith('P2TM')) return "Toon Studio"; 
     if (externalId.startsWith('P2HA')) return "Hollywood Boulevard"; 
+    if (externalId.startsWith('P2EA')) return "World of Frozen"; 
+    if (externalId.startsWith('P2DA')) return "Adventure Way";
     if (externalId.startsWith('P2ZA') || name.includes("Studio Theater")) return "World Premiere Plaza";
     if (externalId.startsWith('P2XA0') || externalId.startsWith('P2E')) return "Worlds of Pixar";
     if (externalId.startsWith('P1RA')) return "Frontierland"; 

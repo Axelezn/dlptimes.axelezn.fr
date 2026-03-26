@@ -12,10 +12,18 @@ let globalAttractionsData = [];
 // ⭐ AJOUT : Fonction pour récupérer le nom du logo
 const getLogoFileName = (landName) => landName.toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, '_') + '_logo.png';
 
-// Génère une heure future (ex: dans 45 min) pour que les shows aient l'air actifs
+
 const getFutureTime = (addMinutes) => {
     const d = new Date();
+
     d.setMinutes(d.getMinutes() + addMinutes);
+    
+
+    const roundedMinutes = Math.round(d.getMinutes() / 5) * 5;
+    d.setMinutes(roundedMinutes);
+    d.setSeconds(0);
+    d.setMilliseconds(0);
+    
     return d.toISOString();
 };
 
