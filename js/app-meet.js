@@ -258,7 +258,7 @@
             characters.forEach(char => {
                 let parkName = char.park ? char.park.name : "Autres";
                 if(parkName === "Disneyland Park") parkName = "Parc Disneyland";
-                if(parkName === "Walt Disney Studios Park") parkName = "Walt Disney Studios Park";
+                if(parkName === "Walt Disney Studios Park") parkName = "Disney Adventure World";
                 let landName = translateText(char.region || "Autre");
 
                 if (!grouped[parkName]) grouped[parkName] = {};

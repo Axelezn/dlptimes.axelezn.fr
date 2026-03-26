@@ -1,11 +1,12 @@
-// js/app-studios.js - V27 (Fix: Favoris réactivés + Tri Couleurs + Passage Libre)
+// js/app-studios.js - V29 (Ajout World of Frozen & Adventure Way)
 
 const CONFIG = {
     DESTINATION_ID: 'e8d0207f-da8a-4048-bec8-117aa946b2c2',
     PARK_ID: 'ca888437-ebb4-4d50-aed2-d227f7096968',
     API_URL: 'https://api.themeparks.wiki/v1/entity/e8d0207f-da8a-4048-bec8-117aa946b2c2/live',
     REFRESH_INTERVAL: 90000,
-    LAND_ORDER: ["Hollywood Boulevard", "World Premiere Plaza", "Toon Studio", "Worlds of Pixar", "Avengers Campus", "Autre / Non Classé"],
+    // ⭐ NOUVEAU : Ajout des deux nouveaux Lands ⭐
+    LAND_ORDER: ["Hollywood Boulevard", "World Premiere Plaza", "Toon Studio", "Worlds of Pixar", "Avengers Campus", "World of Frozen", "Adventure Way", "Autre / Non Classé"],
     VIRTUAL_QUEUE_ATTRACTIONS: [] 
 };
 
@@ -20,6 +21,11 @@ const getLandName = (attraction) => {
     if (externalId.startsWith('P2TM')) return "Toon Studio"; 
     if (externalId.startsWith('P2HA')) return "Hollywood Boulevard"; 
     if (externalId.startsWith('P2ZA')) return "World Premiere Plaza";
+    
+    // ⭐ NOUVEAU : Doit être placé AVANT P2E pour éviter le conflit avec Pixar
+    if (externalId.startsWith('P2EA')) return "World of Frozen"; 
+    if (externalId.startsWith('P2DA')) return "Adventure Way";
+    
     if (externalId.startsWith('P2XA0') || externalId.startsWith('P2E')) return "Worlds of Pixar";
     if (name.includes("Studio Theater") || name.includes("Front Lot")) return "World Premiere Plaza";
     return "Autre / Non Classé";
@@ -32,7 +38,7 @@ const formatReturnTime = (isoString) => {
     catch { return 'Heure inconnue'; }
 };
 
-// ⭐ TRI ET CATÉGORIES (Nettoyage des noms) ⭐
+// ⭐ TRI ET CATÉGORIES ⭐
 const getSortCategory = (attraction) => {
     const wait = attraction.queue?.STANDBY?.waitTime;
     
@@ -40,7 +46,7 @@ const getSortCategory = (attraction) => {
         return "Fermé / Indisponible";
     }
 
-    // Si 0 min => Passage libre 
+    // Si 0 min => Passage libre
     if (wait === 0) return "Passage libre";
 
     let cssClass = 'time-green'; 
@@ -48,16 +54,14 @@ const getSortCategory = (attraction) => {
         cssClass = getTimeClass(attraction.name, wait);
     }
 
-    // CORRECTION : Les noms doivent être identiques à ceux de TIME_CATEGORY_ORDER
     if (cssClass.includes('gold')) return "Faible Affluence";
-    if (cssClass.includes('green')) return "Attente normale"; // Pas de (Vert) ici !
+    if (cssClass.includes('green')) return "Attente normale";
     if (cssClass.includes('orange')) return "Attente Élevée";
     if (cssClass.includes('red')) return "File à éviter";
     
     return "Attente normale";
 };
 
-// Ordre d'affichage
 const TIME_CATEGORY_ORDER = [
     "Faible Affluence", 
     "Attente normale", 
@@ -70,7 +74,6 @@ const TIME_CATEGORY_ORDER = [
 // --- GÉNÉRATION HTML ---
 
 const createFavButton = (id) => {
-    // Vérification que le gestionnaire de favoris est bien chargé
     if (typeof window.isFavorite !== 'function') return '';
     const isActive = window.isFavorite(id);
     const heart = isActive ? '❤️' : '🤍';
@@ -271,10 +274,9 @@ const renderAttractions = () => {
 
 // --- LOGIQUE D'INTERACTION ---
 
-// ⭐ FIX : Renommé pour plus de clarté et ajout de la logique FAVORIS
 const setupListeners = () => {
     document.body.addEventListener('click', (e) => {
-        // 1. Gestion des DPA (Premier Access)
+        // Gestion des DPA
         const header = e.target.closest('.dpa-toggle-header');
         if (header) {
             const details = header.nextElementSibling;
@@ -287,7 +289,7 @@ const setupListeners = () => {
             return;
         }
 
-        // 2. Gestion des Favoris (C'est ce qui manquait !)
+        // Gestion des Favoris
         const favBtn = e.target.closest('.fav-btn');
         if (favBtn && typeof window.toggleFavorite === 'function') {
             e.stopPropagation();
@@ -353,6 +355,6 @@ const fetchAttractionTimes = async () => {
 document.addEventListener('DOMContentLoaded', () => {
     fetchAttractionTimes();
     setInterval(fetchAttractionTimes, CONFIG.REFRESH_INTERVAL);
-    setupListeners(); // Appel de la fonction corrigée
+    setupListeners(); 
     setupSearch(); 
 });

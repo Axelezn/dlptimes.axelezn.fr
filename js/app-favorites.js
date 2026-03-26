@@ -333,7 +333,7 @@ const loadFavoritesPage = async () => {
         }
 
         if (attrWDS.length > 0) {
-            html += `<h1 class="park-show-header" style="margin-top:40px;">Walt Disney Studios</h1>`;
+            html += `<h1 class="park-show-header" style="margin-top:40px;">Disney Adventure World</h1>`;
             const byLand = attrWDS.reduce((acc, attr) => {
                 const land = getLandName(attr);
                 if (!acc[land]) acc[land] = []; acc[land].push(attr); return acc;

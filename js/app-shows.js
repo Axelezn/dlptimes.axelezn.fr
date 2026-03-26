@@ -288,7 +288,7 @@ const fetchShowTimes = async () => {
             return acc;
         }, {});
 
-        const parkOrder = ["Parc Disneyland", "Walt Disney Studios Park", "Inconnu"];
+        const parkOrder = ["Parc Disneyland", "Disney Adventure World", "Inconnu"];
 
         parkOrder.forEach(park => {
             const parkData = showsByPark[park];
