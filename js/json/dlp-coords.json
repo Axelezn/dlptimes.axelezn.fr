@@ -317,17 +317,15 @@
       "lon" : 2.7786895
   },
   {
-   "name": "Raiponse Tangled Spin",
+   "name": "Raiponce Tangled Spin",
    "type": "ATTRACTION",
    "lat" : 48.8661667,
-   "lon" : 2.7766125,
-   "status": "UPCOMING"
+   "lon" : 2.7766125
   },
   {
    "name": "Frozen Ever After",
    "type": "ATTRACTION",
    "lat": 48.8641280,
-   "lon": 2.7735340,
-   "status": "UPCOMING"
+   "lon": 2.7735340
   }
 ]

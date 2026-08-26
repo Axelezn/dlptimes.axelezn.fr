@@ -39,7 +39,7 @@ const ATTRACTION_THRESHOLDS = {
   "Disneyland Railroad Frontierland Depot": [
     { maxTime: 15, className: "time-green" },
     { maxTime: 35, className: "time-orange" },
-    { maxTime: Infinity, className: "time-time-red" }, // Très rarement long
+    { maxTime: Infinity, className: "time-red" }, // Très rarement long
   ],
 
   // ADVENTURELAND

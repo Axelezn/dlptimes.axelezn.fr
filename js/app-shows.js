@@ -1,4 +1,4 @@
-// js/app-shows.js - V34 (Fix: Renommage WDS en Disney Adventure World)
+// js/app-shows.js - V35 (Fix: Exclusion des rencontres personnages "MG")
 
 // ⭐ CONSTANTES
 const CONFIG = {
@@ -9,7 +9,9 @@ const CONFIG = {
     REFRESH_INTERVAL: 120000,
     EXCLUDED_SHOWS: [
         "Reserved viewing area: Disney Stars on Parade",
-        "Reserved viewing area: Nighttime show"
+        "Reserved viewing area: Nighttime show",
+        "Reserved viewing area: Disney Tales of Magic",
+        "Reserved Viewing Area : Disney Cascade of Lights"
     ]
 };
 
@@ -24,19 +26,41 @@ const formatMinutes = (minutes) => {
 
 const translateShowName = (name) => {
     const map = {
-        "A Sweet Moment with Mrs. Claus" : "Le Partage Gourmand de la Mère Noël",
-        "Disney Princess Holiday Season Celebration": "Les Princesses Disney célèbrent les Fêtes de Fin d'Année",
-        "Holiday Gathering" : "Retrouvailles de Fêtes",
-        "Let’s Sing Christmas!":"Spectacle musical Chantons Noël !",
-        "Mickey's Dazzling Christmas Parade!":"Mickey et sa Parade Etincelante de Noël !",
-        "Mickey’s PhilharMagic": "Mickey et son Orchestre PhilharMagique",
-        "Princess Aurora's Magical Wishes":"Les Voeux Magiques de la Princesse Aurore",
-        "The Lion King: Rhythms of the Pride Lands":"Le Roi Lion et les Rythmes de la Terre",
-        "Doctor Strange: Mystery of the Mystics!" : "Doctor Strange : Mystères Mystiques",
-        "Frozen: A Musical Invitation" : "La Reine des Neiges : Une Invitation Musicale",
-        "TOGETHER: a Pixar Musical Adventure" : "TOGETHER : une Aventure Musicale Pixar",
-        "Stitch Live!": "Stitch Live!",
-    };
+"Alice and the Queen of Hearts: Back to Wonderland" : "Alice et la Reine de Cœur : Retour au Pays des Merveilles",
+        "Doctor Strange: Mystery of the Mystics!"            : "Doctor Strange : Mystères Mystiques",
+        "Frozen: A Musical Invitation"                       : "La Reine des Neiges : Une Invitation Musicale",
+        "Mickey and the Magician"                            : "Mickey et le Magicien",
+        "Mickey’s PhilharMagic"                              : "Mickey et son Orchestre PhilharMagique",
+        "Stitch Live!"                                       : "Stitch Live!",
+        "The Lion King: Rhythms of the Pride Lands"          : "Le Roi Lion et les Rythmes de la Terre",
+        "TOGETHER: a Pixar Musical Adventure"                : "TOGETHER : une Aventure Musicale Pixar",
+        "Disney Junior Dream Factory"                        : "La Fabrique des Rêves de Disney Junior",
+        "Disney Princess Musical Memories"                   : "La Valse Royale de la Belle au Bois Dormant", 
+        "A Celebration in Arendelle"                         : "Célébration à Arendelle",
+        "Disney Princess Cavalcade"                              : "La Cavalcade des Princesses Disney",
+        "Minnie’s Dream Factory"                             : "La Fabrique des Rêves de Minnie",
+        "Musical Moment with Mary Poppins and the Pearly Band"          : "Un Moment Musical avec Mary Poppins et la Fanfare des Perles",
+
+        // --- 🎄 Spectacles de Saison & Noël ---
+        "A Sweet Moment with Mrs. Claus"                     : "Le Partage Gourmand de la Mère Noël",
+        "Disney Princess Holiday Season Celebration"         : "Les Princesses Disney célèbrent les Fêtes de Fin d'Année",
+        "Holiday Gathering"                                  : "Retrouvailles de Fêtes",
+        "Let’s Sing Christmas!"                              : "Spectacle musical Chantons Noël !",
+        "Mickey's Dazzling Christmas Parade!"                : "Mickey et sa Parade Étincelante de Noël !",
+        "Princess Aurora's Magical Wishes"                   : "Les Vœux Magiques de la Princesse Aurore",
+
+        // --- 🌟 Parades & Célébrations de Rue ---
+        "Disney Stars on Parade"                             : "Disney Stars on Parade",
+        "Dream... and Shine Brighter!"                       : "Rêvons... et chantons plus fort !",
+        "Live Your Story – a Disney Princess Celebration"    : "Célébration des Princesses Disney",
+
+        // --- 🎆 Spectacles Nocturnes ---
+        "Disney Cascade of Lights"                           : "Disney Cascade of Lights",
+        "Disney Electrical Sky Parade"                       : "Disney Electrical Sky Parade",
+        "Disney Illuminations"                               : "Disney Illuminations",
+        "Disney Tales of Magic"                              : "Disney Tales of Magic"};
+
+    // Si le nom existe dans le dictionnaire, retourne la traduction, sinon retourne le nom brut de l'API
     return map[name] || name;
 };
 
@@ -44,7 +68,6 @@ const getLocation = (entity) => {
     let loc = { park: "Inconnu", land: "" };
     
     if (entity.parkId === CONFIG.PARK_ID_DLP) loc.park = "Parc Disneyland";
-    // ⭐ CORRECTION ICI : Le nom officiel
     else if (entity.parkId === CONFIG.PARK_ID_WDS) loc.park = "Disney Adventure World";
 
     const eid = entity.externalId || '';
@@ -52,12 +75,18 @@ const getLocation = (entity) => {
     else if (eid.startsWith('P1GS21')) loc.land = "Itinéraire Parade";
     else if (eid.startsWith('P1GS34')) loc.land = "Frontierland Theater";
     else if (eid.startsWith('P2GS58')) loc.land = "Studio Theater";
-    else if (eid.startsWith('P2YS03')) loc.land = "World Premiere Plaza";
     else if (eid.startsWith('P1GS99')) loc.land = "Central Plaza / Main Street";
     else if (eid.startsWith('P2GS54')) loc.land = "Animation Celebration";
     else if (eid.startsWith('P2GS23')) loc.land ="Animation Celebration";
     else if (eid.startsWith('P2GS63')) loc.land = "Avengers Campus";
     else if (eid.startsWith('P2YS08')) loc.land="Animagique Theater";
+    else if (eid.startsWith('P1GS93')) loc.land="Théâtre du Château";
+    else if (eid.startsWith('P2GS76')) loc.land="Lac d'Arendelle";
+    else if (eid.startsWith('P2DS00')) loc.land="Lac Adventure Way";
+    else if (eid.startsWith('P2GS78')) loc.land="Itinéraire Parade Adventure Way";
+    else if (eid.startsWith('P2GS33')) loc.land="World Premiere Plaza - Studio D";
+    else if (eid.startsWith('P2YS03')) loc.land="World Première Plaza - Studio 4 ";
+    else if (eid.startsWith('P2GS74')) loc.land="Gazebo Adventure Way";
     else if (entity.areaName) loc.land = entity.areaName;
     else loc.land = eid.startsWith('P1') ? "Parc Disneyland" : "Disney Adventure World";
 
@@ -130,7 +159,6 @@ const createShowCardHtml = (show, location) => {
                 const formattedCountdown = formatMinutes(minDiff);
                 const urgencyClass = getShowUrgencyClass(minDiff);
                 let countdownClass = 'countdown-default'; 
-                let urgencyMessage = '';
 
                 if (urgencyClass === 'time-gold-box') { countdownClass = 'countdown-gold'; }
                 else if (urgencyClass === 'time-red-box') countdownClass = 'countdown-red';
@@ -254,10 +282,14 @@ const fetchShowTimes = async () => {
         if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
         const data = await response.json();
         
+        // ⭐ MODIFICATION : Inclusions de PhilharMagic (même si ATTRACTION) et exclusions (MG, RV & Reserved Viewing)
         const allShows = (data.liveData || []).filter(entity => 
-            entity.entityType === 'SHOW' && 
+            (entity.entityType === 'SHOW' || (entity.name && entity.name.includes("PhilharMagic"))) && 
             (entity.parkId === CONFIG.PARK_ID_DLP || entity.parkId === CONFIG.PARK_ID_WDS) &&
-            !CONFIG.EXCLUDED_SHOWS.includes(entity.name) 
+            !CONFIG.EXCLUDED_SHOWS.includes(entity.name) &&
+            !(entity.name && entity.name.toLowerCase().includes('reserved viewing area')) &&
+            !(entity.externalId && entity.externalId.includes('MG')) &&
+            !(entity.externalId && entity.externalId.includes('RV'))
         );
 
         // FILTRE GLOBAL : On garde ce qui a des horaires AUJOURD'HUI (même passés) ou qui est en Réno/Panne
@@ -288,7 +320,6 @@ const fetchShowTimes = async () => {
             return acc;
         }, {});
 
-        // ⭐ L'ordre correspond maintenant au vrai nom que vous générez ⭐
         const parkOrder = ["Parc Disneyland", "Disney Adventure World", "Inconnu"];
 
         parkOrder.forEach(park => {

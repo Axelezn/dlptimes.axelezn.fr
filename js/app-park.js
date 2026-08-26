@@ -1,4 +1,4 @@
-// js/app-park.js - V26 (Fix: 0min classé dans "Normal" + Moyenne sous titre)
+// js/app-park.js - V27 (Fix: Exclusion Mickey's PhilharMagic + 0min classé dans "Normal")
 
 const CONFIG = {
     DESTINATION_ID: 'e8d0207f-da8a-4048-bec8-117aa946b2c2',
@@ -29,11 +29,14 @@ const getLandName = (attraction) => {
 const getLogoFileName = (landName) => landName.toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, '_') + '_logo.png';
 
 const formatReturnTime = (isoString) => {
-    try { return new Date(isoString).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }).replace(':', 'h'); } 
-    catch { return 'Heure inconnue'; }
+    try { 
+        return new Date(isoString).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }).replace(':', 'h'); 
+    } catch { 
+        return 'Heure inconnue'; 
+    }
 };
 
-// ⭐ FIX ICI : 0 min => Catégorie Normale (Vert) ⭐
+// ⭐ 0 min => Catégorie Normale (Vert)
 const getSortCategory = (attraction) => {
     const wait = attraction.queue?.STANDBY?.waitTime;
     
@@ -42,10 +45,10 @@ const getSortCategory = (attraction) => {
         return "Fermé / Indisponible";
     }
 
-    // EXCEPTION : Si 0 min, on le force dans le vert
+    // EXCEPTION : Si 0 min, force dans le vert
     if (wait === 0) return "Attente normale (Vert)";
 
-    // Sinon, on suit la logique des couleurs
+    // Sinon, suite de la logique des couleurs
     let cssClass = 'time-green'; 
     if (typeof getTimeClass === 'function') {
         cssClass = getTimeClass(attraction.name, wait);
@@ -332,8 +335,11 @@ const fetchAttractionTimes = async () => {
         if (!response.ok) throw new Error('API Error');
         const { liveData = [] } = await response.json();
         
+        // ⭐ Exclusion de Mickey's PhilharMagic car géré dans les spectacles
         globalAttractionsData = liveData
-            .filter(e => e.entityType === 'ATTRACTION' && e.parkId === CONFIG.PARK_ID)
+            .filter(e => e.entityType === 'ATTRACTION' && 
+                         e.parkId === CONFIG.PARK_ID && 
+                         !(e.name && e.name.toLowerCase().includes('philharmagic')))
             .map(e => ({ ...e }));
         
         renderFilters();

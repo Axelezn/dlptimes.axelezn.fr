@@ -1,440 +1,158 @@
 [
   {
-    "titre": "Rencontre avec Winnie l'Ourson",
-    "land": "Main Street, U.S.A.",
-    "emplacement": "Proche Storybook Store",
-    "localisation": {
-      "lat": 48.8710626,
-      "lon": 2.7780941
-    },
-    "horaires": ["09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00"],
-    "startDate": "2024-01-01",
-    "endDate": "2025-12-31",
-    "disneyPhotopass": true,
-    "reservationParc": false,
-    "fileAttenteVirtuelle": false
+    "id": "P1MG02",
+    "nom": "Winnie l'Ourson",
+    "localisation": { "lat": 48.8710626, "lon": 2.7780941 }
   },
   {
-    "titre": "Rencontre avec Tic et Tac",
-    "land": "Fantasyland",
-    "emplacement": "Proche Meet Mickey",
-    "localisation": {
-      "lat": 48.8743100,
-      "lon": 2.7742418
-    },
-    "horaires": ["09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00", "14:30"],
-    "startDate": "2024-01-01",
-    "endDate": "2025-12-31",
-    "disneyPhotopass": true,
-    "reservationParc": false,
-    "fileAttenteVirtuelle": false
+    "id": "P1MG07-old",
+    "nom": "Tic et Tac",
+    "localisation": { "lat": 48.8743100, "lon": 2.7742418 }
   },
   {
-    "titre": "Rencontre avec Stitch",
-    "land": "Main Street, U.S.A.",
-    "emplacement": "Proche Casey's Corner / Sortie Liberty Arcade",
-    "localisation": {
-      "lat": 48.8719316,
-      "lon": 2.7769248
-    },
-    "horaires": ["09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:10", "13:30"],
-    "startDate": "2024-01-01",
-    "endDate": "2025-12-31",
-    "disneyPhotopass": true,
-    "reservationParc": false,
-    "fileAttenteVirtuelle": false
+    "id": "meetStitch",
+    "nom": "Stitch",
+    "localisation": { "lat": 48.8719316, "lon": 2.7769248 }
   },
   {
-    "titre": "Rencontre avec un Personnage du film Le Roi Lion",
-    "land": "Adventureland",
-    "emplacement": "Entre Indiana Jones Adventure Outpost et Colonel Hathi's Restaurant",
-    "localisation": {
-      "lat": 48.8715095,
-      "lon": 2.7735545
-    },
-    "horaires": ["10:45", "11:00", "11:30", "12:00", "12:30", "13:00"],
-    "startDate": "2026-01-07",
-    "endDate": "2026-02-05",
-    "disneyPhotopass": false,
-    "reservationParc": false,
-    "fileAttenteVirtuelle": false
-  },
-    {
-    "titre": "Rencontre avec un Personnage du film Le Roi Lion",
-    "land": "Adventureland",
-    "emplacement": "Entre Indiana Jones Adventure Outpost et Colonel Hathi's Restaurant",
-    "localisation": {
-      "lat": 48.8715095,
-      "lon": 2.7735545
-    },
-    "horaires": ["11:45", "12:00", "12:30", "13:00", "13:30"],
-    "startDate": "2026-02-06",
-    "endDate": "2026-02-28",
-    "disneyPhotopass": false,
-    "reservationParc": false,
-    "fileAttenteVirtuelle": false
+    "id": "P1M112",
+    "nom": "Le Roi Lion",
+    "localisation": { "lat": 48.8715095, "lon": 2.7735545 }
   },
   {
-    "titre": "Rencontre avec Baloo",
-    "land": "Adventureland",
-    "emplacement": "Proche Restaurant Hakuna Matata",
-    "localisation": {
-      "lat": 48.8722288,
-      "lon": 2.7749039
-    },
-    "horaires": ["10:45", "11:15", "11:45", "12:15", "12:45", "13:15"],
-    "startDate": "2026-01-07",
-    "endDate": "2026-02-05",
-    "disneyPhotopass": false,
-    "reservationParc": false,
-    "fileAttenteVirtuelle": false
+    "id": "P1MG20",
+    "nom": "Baloo",
+    "localisation": { "lat": 48.8722288, "lon": 2.7749039 }
   },
   {
-    "titre": "Rencontre avec Baloo",
-    "land": "Adventureland",
-    "emplacement": "Proche Restaurant Hakuna Matata",
-    "localisation": {
-      "lat": 48.8722288,
-      "lon": 2.7749039
-    },
-    "horaires": ["11:45", "12:00", "12:30", "13:00", "13:30"],
-    "startDate": "2026-02-06",
-    "endDate": "2026-12-31",
-    "disneyPhotopass": false,
-    "reservationParc": false,
-    "fileAttenteVirtuelle": false
+    "id": "P1MG01",
+    "nom": "Alice aux Pays des Merveilles",
+    "localisation": { "lat": 48.8740550, "lon": 2.7755146 }
   },
   {
-    "titre": "Rencontre avec les personnages d'Alice aux Pays des Merveilles",
-    "land": "Fantasyland",
-    "emplacement": "Sortie Sir. Mickey's Boutique",
-    "localisation": {
-      "lat": 48.8740550,
-      "lon": 2.7755146
-    },
-    "horaires": ["12:35"],
-    "startDate": "2026-02-07",
-    "endDate": "2026-02-28",
-    "disneyPhotopass": false,
-    "reservationParc": false,
-    "fileAttenteVirtuelle": false
+    "id": "P1M116",
+    "nom": "Pavillon des Princesses",
+    "localisation": { "lat": 48.8747620, "lon": 2.7755644 }
   },
   {
-    "titre": "Pavillon des Princesses",
-    "land": "Fantasyland",
-    "emplacement": "Sortie \"it's a small world !\"",
-    "localisation": {
-      "lat": 48.8747620,
-      "lon": 2.7755644
-    },
-    "horaires": [],
-    "startDate": "2024-01-01",
-    "endDate": "2025-12-31",
-    "horaires_notes": "Voir horaires de réservation sur l'application officielle",
-    "disneyPhotopass": true,
-    "reservationParc": true,
-    "fileAttenteVirtuelle": true
+    "id": "P1MG03",
+    "nom": "Dingo (Frontierland)",
+    "localisation": { "lat": 48.8710505, "lon": 2.7739964 }
   },
   {
-    "titre": "Rencontre avec Dingo",
-    "land": "Frontierland",
-    "emplacement": "Big Thunder Mountain Gazebo",
-    "localisation": {
-      "lat": 48.8710505,
-      "lon": 2.7739964
-    },
-    "horaires": ["10:00", "10:30", "11:00", "11:30", "12:00", "14:30", "15:00", "15:30"],
-    "startDate": "2024-01-01",
-    "endDate": "2025-12-31",
-    "disneyPhotopass": false,
-    "reservationParc": false,
-    "fileAttenteVirtuelle": false
+    "id": "P1M113",
+    "nom": "Le Lapin Blanc",
+    "localisation": { "lat": 48.8745552, "lon": 2.7751855 }
   },
   {
-    "titre": "Rencontre avec Le Lapin Blanc",
-    "land": "Fantasyland",
-    "emplacement": "Proche Mad Hatter's Tea Cups",
-    "localisation": {
-      "lat": 48.8745552,
-      "lon": 2.7751855
-    },
-    "horaires": ["10:45", "11:15", "11:45", "12:15", "12:45"],
-    "startDate": "2026-01-07",
-    "endDate": "2026-02-06",
-    "disneyPhotopass": false,
-    "reservationParc": false,
-    "fileAttenteVirtuelle": false
+    "id": "mickeyAtPhantomManor",
+    "nom": "Mickey (Phantom Manor)",
+    "localisation": { "lat": 48.8709675, "lon": 2.7769640 }
   },
   {
-    "titre": "Rencontre avec Le Lapin Blanc",
-    "land": "Fantasyland",
-    "emplacement": "Proche Mad Hatter's Tea Cups",
-    "localisation": {
-      "lat": 48.8745552,
-      "lon": 2.7751855
-    },
-    "horaires": ["11:45", "12:00", "12:30", "13:00", "13:30"],
-    "startDate": "2026-02-07",
-    "endDate": "2026-02-28",
-    "disneyPhotopass": false,
-    "reservationParc": false,
-    "fileAttenteVirtuelle": false
+    "id": "P1MG19",
+    "nom": "Monsieur Jack",
+    "localisation": { "lat": 48.8706110, "lon": 2.7724462 }
   },
   {
-    "titre": "Rencontre avec Mickey à Phantom Manor",
-    "land": "Frontierland",
-    "emplacement": "Phantom Manor Gazebo",
-    "localisation": {
-      "lat": 48.8709675,
-      "lon": 2.7769640
-    },
-    "horaires": [],
-    "startDate": "2024-01-01",
-    "endDate": "6-12-31",
-    "horaires_notes": "Voir horaires de réservation sur l'application officielle",
-    "disneyPhotopass": true,
-    "reservationParc": true,
-    "fileAttenteVirtuelle": true
+    "id": "P1MG09",
+    "nom": "Aladdin",
+    "localisation": { "lat": 48.8726443, "lon": 2.7747865 }
   },
   {
-    "titre": "Rencontre avec Monsieur Jack",
-    "land": "Frontierland",
-    "emplacement": "Phantom Manor Gazebo",
-    "localisation": {
-      "lat": 48.8706110,
-      "lon": 2.7724462
-    },
-    "horaires": [],
-    "startDate": "2024-10-01",
-    "endDate": "2025-12-31",
-    "horaires_notes": "Voir horaires de réservation",
-    "disneyPhotopass": true,
-    "reservationParc": true,
-    "fileAttenteVirtuelle": true
+    "id": "P1MG83",
+    "nom": "Le Mandalorien",
+    "localisation": { "lat": 48.8743154, "lon": 2.7798958 }
   },
   {
-    "titre": "Rencontre avec un personnage d'Aladdin",
-    "land": "Adventureland",
-    "emplacement": "Agrabah",
-    "localisation": {
-      "lat": 48.8726443,
-      "lon": 2.7747865
-    },
-    "horaires": ["10:00", "10:30", "11:00", "11:30", "12:00", "14:30", "15:00", "15:30"],
-    "startDate": "2024-01-01",
-    "endDate": "2025-12-31",
-    "disneyPhotopass": false,
-    "reservationParc": false,
-    "fileAttenteVirtuelle": false
+    "id": "P1M117",
+    "nom": "Starport",
+    "localisation": { "lat": 48.8746100, "lon": 2.7791334 }
   },
   {
-    "titre": "Rencontrez Le Mandalorien !",
-    "land": "Discoveryland",
-    "emplacement": "Discoveryland",
-    "localisation": {
-      "lat": 48.8743154,
-      "lon": 2.7798958
-    },
-    "horaires": ["10:20", "10:50", "11:20", "14:20", "14:50", "15:20"],
-    "startDate": "2026-01-06",
-    "endDate": "2026-12-31",
-    "disneyPhotopass": false,
-    "reservationParc": false,
-    "fileAttenteVirtuelle": false
+    "id": "P2MG18",
+    "nom": "Jessie",
+    "localisation": { "lat": 48.8677222, "lon": 2.7776681 }
   },
   {
-    "titre": "Starport : rencontre avec un Personnage Star Wars",
-    "land": "Discoveryland",
-    "horaires_notes": "Voir horaires de réservation sur l'application officielle",
-    "emplacement": "Starport",
-    "localisation": {
-      "lat": 48.8746100,
-      "lon": 2.7791334
-    },
-    "startDate": "2024-01-01",
-    "endDate": "2026-12-31",
-    "disneyPhotopass": true,
-    "reservationParc": true,
-    "fileAttenteVirtuelle": true
+    "id": "P2MG15",
+    "nom": "Woody",
+    "localisation": { "lat": 48.8678917, "lon": 2.7776203 }
   },
   {
-    "titre": "Rencontre avec Jessie",
-    "land": "World of Pixar",
-        "horaires": ["10:30", "11:00", "11:30", "12:00", "12:30", "15:00", "15:30","16:00"],
-    "emplacement": "Proche CARS 4 Roues Rallye",
-    "localisation": {
-      "lat": 48.8677222,
-      "lon": 2.7776681
-    },
-    "startDate": "2024-01-01",
-    "endDate": "2026-12-31",
-    "disneyPhotopass": true,
-    "reservationParc": true,
-    "fileAttenteVirtuelle": true
-  },
-    {
-    "titre": "Rencontre avec Woody",
-    "land": "World of Pixar",
-        "horaires": ["10:30", "11:00", "11:30", "12:00", "12:30", "15:00", "15:30","16:00"],
-    "emplacement": "Proche CARS 4 Roues Rallye",
-    "localisation": {
-      "lat": 48.8678917,
-      "lon": 2.7776203
-    },
-    "startDate": "2024-01-01",
-    "endDate": "2026-12-31",
-    "disneyPhotopass": true,
-    "reservationParc": true,
-    "fileAttenteVirtuelle": true
+    "id": "P2MG31",
+    "nom": "Dingo Réalisateur",
+    "localisation": { "lat": 48.8680617, "lon": 2.7799380 }
   },
   {
-    "titre" : "Rencontre avec Dingo, Réalisateur de Cinéma",
-    "land": "Front Lot",
-    "horaires" : ["12:45", "13:00", "13:30", "13:45", "14:15", "14:30", "16:30", "16:45", "17:15", "17:30", "18:00", "18:15"],
-    "emplacement" : "",
-    "localisation" : {
-      "lat" : 48.8680617,
-      "lon" : 2.7799380
-    },
-    "startDate" : "2026-02-01",
-    "endDate" : "2026-02-28",
-    "disneyPhotopass" : true,
-    "reservationParc" : false,
-    "fileAttenteVirtuelle" : false
+    "id": "P1MG74",
+    "nom": "Belle",
+    "localisation": { "lat": 48.8748167, "lon": 2.7752307 }
   },
   {
-    "titre" : "Rencontre avec Belle",
-    "land": "Fantasyland",
-    "horaires" : ["11:15"],
-    "emplacement" : "Proche The Old Mill",
-    "localisation" : {
-      "lat" : 48.8748167,
-      "lon" : 2.7752307
-    },
-    "startDate" : "2026-01-08",
-    "endDate" : "2026-02-06",
-    "disneyPhotopass" : true,
-    "reservationParc" : false,
-    "fileAttenteVirtuelle" : false
+    "id": "P1MG57",
+    "nom": "Minnie",
+    "localisation": { "lat": 48.8719316, "lon": 2.7769248 }
   },
   {
-    "titre" : "Rencontre avec Belle",
-    "land": "Fantasyland",
-    "horaires" : ["12:15"],
-    "emplacement" : "Proche The Old Mill",
-    "localisation" : {
-      "lat" : 48.8748167,
-      "lon" : 2.7752307
-    },
-    "startDate" : "2026-02-07",
-    "endDate" : "2026-02-28",
-    "disneyPhotopass" : true,
-    "reservationParc" : false,
-    "fileAttenteVirtuelle" : false
+    "id": "P1MG33",
+    "nom": "Max",
+    "localisation": { "lat": 48.8710626, "lon": 2.7780941 }
   },
   {
-    "titre": "Rencontre avec Minnie",
-    "land": "Main Street, U.S.A.",
-    "emplacement": "Proche Casey's Corner / Sortie Liberty Arcade",
-    "localisation": {
-      "lat": 48.8719316,
-      "lon": 2.7769248
-    },
-    "horaires": ["09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:10", "13:30"],
-    "startDate": "2026-01-07",
-    "endDate": "2026-02-28",
-    "disneyPhotopass": true,
-    "reservationParc": false,
-    "fileAttenteVirtuelle": false
+    "id": "P1MG40",
+    "nom": "Tigrou",
+    "localisation": { "lat": 48.8719316, "lon": 2.7769248 }
+  },
+  {
+    "id": "P2MG20",
+    "nom": "Olaf",
+    "localisation": { "lat": 48.8672315, "lon": 2.7786895 }
+  },
+  {
+    "id": "P2MG43",
+    "nom": "Marvel Hero Training Center",
+    "localisation": { "lat": 48.8654200, "lon": 2.7789820 }
+  },
+  {
+    "id": "P2MG72",
+    "nom": "Rencontre avec la Bergère",
+    "localisation": { "lat": 48.8677222, "lon": 2.7776681 }
   },
    {
-    "titre": "Rencontre avec Max",
-    "land": "Main Street, U.S.A.",
-    "emplacement": "Boarding House",
-    "localisation": {
-      "lat": 48.8710626,
-      "lon": 2.7780941
-    },
-    "horaires": ["10:45","11:00","11:30","12:00","12:30"],
-    "startDate": "2026-01-08",
-    "endDate": "2026-02-06",
-    "disneyPhotopass": true,
-    "reservationParc": false,
-    "fileAttenteVirtuelle": false
-  },
-  {
-    "titre": "Rencontre avec Max",
-    "land": "Main Street, U.S.A.",
-    "emplacement": "Boarding House",
-    "localisation": {
-      "lat": 48.8710626,
-      "lon": 2.7780941
-    },
-    "horaires": ["11:45","12:00","12:30","13:00","13:30"],
-    "startDate": "2026-02-06",
-    "endDate": "2026-02-28",
-    "disneyPhotopass": true,
-    "reservationParc": false,
-    "fileAttenteVirtuelle": false
-  },
-  {
-    "titre": "Rencontre avec Tigrou",
-    "land": "Main Street, U.S.A.",
-    "emplacement": "Proche Casey's Corner / Sortie Liberty Arcade",
-    "localisation": {
-      "lat": 48.8719316,
-      "lon": 2.7769248
-    },
-    "horaires": ["10:45","11:15","11:45","12:15","12:45", "13:15"],
-    "startDate": "2026-01-07",
-    "endDate": "2026-02-06",
-    "disneyPhotopass": true,
-    "reservationParc": false,
-    "fileAttenteVirtuelle": false
-  },
-  {
-    "titre": "Rencontre avec Tigrou",
-    "land": "Main Street, U.S.A.",
-    "emplacement": "Proche Casey's Corner / Sortie Liberty Arcade",
-    "localisation": {
-      "lat": 48.8719316,
-      "lon": 2.7769248
-    },
-    "horaires": ["11:45","12:00","12:30","13:00","13:30"],
-    "startDate": "2026-02-07",
-    "endDate": "2026-02-28",
-    "disneyPhotopass": true,
-    "reservationParc": false,
-    "fileAttenteVirtuelle": false
-  },
-  {
-    "titre": "Rencontre avec Olaf",
-    "land": "World Premiere Plaza",
-    "emplacement": "Animation Celebration",
-    "localisation": {
-      "lat": 48.8672315,
-      "lon": 2.7786895
-    },
-    "horaires": ["10:00","10:30","11:00","11:30","12:00","12:30","13:00","13:30","14:00","14:30"],
-    "startDate": "2026-01-07",
-    "endDate": "2026-02-06",
-    "disneyPhotopass": true,
-    "reservationParc": false,
-    "fileAttenteVirtuelle": false
-  },
+    "id": "P1MG36",
+    "nom": "Rencontrez un personnage du Roi Lion",
+    "localisation": { "lat": 48.8715095, "lon": 2.7735545 }
+   },
    {
-    "titre": "Rencontre avec Dingo",
-    "land": "Frontierland",
-    "emplacement": "Cowboy Cookout Barbecue",
-    "localisation": {
-      "lat": 48.8709991,
-      "lon": 2.7733260
-    },
-    "horaires": ["10:00","10:30","11:00","11:30","12:00","12:30","13:00","13:30","14:00","14:30","15:00","15:30","16:00"],
-    "startDate": "2026-01-07",
-    "endDate": "2026-02-06",
-    "disneyPhotopass": true,
-    "reservationParc": false,
-    "fileAttenteVirtuelle": false
-  }
+    "id" : "P1MG86",
+    "nom" : "Rencontre avec Minnie ou ses amis à travers l'Europe",
+    "localisation": { "lat": 48.8743341, "lon": 2.7787130 }
+   },
+   {
+    "id" : "P1M115",
+    "nom" : "Rencontre avec Mickey",
+    "localisation": { "lat": 48.8744190, "lon": 2.7738541 }
+   },
+   {
+    "id" : "P1MG23",
+    "nom" : "Rencontre avec un personnage d'Alice aux Pays des Merveilles",
+    "localisation": { "lat": 48.8745552, "lon": 2.7751855 }
+   },
+   {
+    "id" : "P1MG65",
+    "nom" : "Rencontre Mystérieuse",
+    "localisation": { "lat": 48.8709675, "lon": 2.7769640 }
+   },
+   {
+    "id": "P1MG33",
+    "nom" : "Rencontre avec Max",
+    "localisation": { "lat": 48.8710626, "lon": 2.7780941 }
+   },
+   {
+    "id" : "P2MG66",
+    "nom" : "Rencontre Royale",
+    "localisation": { "lat": 48.8642538, "lon": 2.7730444 }
+   }
+
 ]

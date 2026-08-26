@@ -34,7 +34,6 @@ const formatReturnTime = (isoString) => {
     catch { return 'Heure inconnue'; }
 };
 
-// ⭐ TRI ET CATÉGORIES ⭐
 const getSortCategory = (attraction) => {
     const wait = attraction.queue?.STANDBY?.waitTime;
     
@@ -42,7 +41,6 @@ const getSortCategory = (attraction) => {
         return "Fermé / Indisponible";
     }
 
-    // Si 0 min => Passage libre
     if (wait === 0) return "Passage libre";
 
     let cssClass = 'time-green'; 
@@ -67,7 +65,6 @@ const TIME_CATEGORY_ORDER = [
     "Fermé / Indisponible"
 ];
 
-// --- GÉNÉRATION HTML ---
 
 const createFavButton = (id) => {
     if (typeof window.isFavorite !== 'function') return '';
